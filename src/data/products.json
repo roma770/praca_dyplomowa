@@ -1,0 +1,34 @@
+[
+  {
+    "id": "b1",
+    "name": "Ніжність у рожевому",
+    "category": "bouquets",
+    "price": 1200,
+    "image": "https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=600&q=80",
+    "description": "Класичний букет з рожевих троянд та півоній."
+  },
+  {
+    "id": "m1",
+    "name": "М'ясний Гігант",
+    "category": "mens",
+    "price": 2100,
+    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+    "description": "Чоловічий букет із мисливських ковбасок, сиру чеддер та запеченого багету."
+  },
+  {
+    "id": "ball1",
+    "name": "Сет кульок 'Романтика'",
+    "category": "balloons",
+    "price": 650,
+    "image": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80",
+    "description": "10 гелієвих кульок у формі сердець."
+  },
+  {
+    "id": "s1",
+    "name": "Ароматична свічка 'Lavander'",
+    "category": "souvenirs",
+    "price": 350,
+    "image": "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=600&q=80",
+    "description": "Натуральний соєвий віск з ароматом лаванди."
+  }
+]
