@@ -1,13 +1,12 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-
-// Заглушки для страниц (скоро создадим их)
-const Home = () => <div className="p-8 text-center text-xl font-bold">Головна сторінка каталогу</div>;
-const Builder = () => <div className="p-8 text-center text-xl font-bold">Онлайн-конструктор букета</div>;
-const Mens = () => <div className="p-8 text-center text-xl font-bold">Чоловічі букети (Ковбаси, сири)</div>;
-const Checkout = () => <div className="p-8 text-center text-xl font-bold">Оформлення замовлення та доставка</div>;
+import { EventModal } from './components/EventModal';
+import { Home } from './pages/Home';
+import { MensSection } from './pages/MensSection';
+import { Builder } from './pages/Builder';
+import { Checkout } from './pages/Checkout';
+import { OrderSuccess } from './pages/OrderSuccess';
 
 export default function App() {
   return (
@@ -18,11 +17,14 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/builder" element={<Builder />} />
-            <Route path="/mens" element={<Mens />} />
+            <Route path="/mens" element={<MensSection />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order/:id" element={<OrderSuccess />} />
           </Routes>
         </main>
         <Footer />
+        {/* Одно модальное окно на всё приложение */}
+        <EventModal />
       </div>
     </Router>
   );

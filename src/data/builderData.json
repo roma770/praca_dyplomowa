@@ -1,13 +1,14 @@
 {
+  "maxFlowers": 25,
   "wrappers": [
-    { "id": "w1", "name": "Крафтовий папір", "price": 80 },
-    { "id": "w2", "name": "Оксамитова стрічка + коробка", "price": 200 },
-    { "id": "w3", "name": "Матова плівка", "price": 120 }
+    { "id": "w1", "name": "Крафтовий папір", "price": 80, "color": "#c9a26b", "ribbon": "#8b5a2b", "opacity": 1 },
+    { "id": "w2", "name": "Оксамитова стрічка + коробка", "price": 200, "color": "#7a1f3d", "ribbon": "#d4af37", "opacity": 1 },
+    { "id": "w3", "name": "Матова плівка", "price": 120, "color": "#f5f5f7", "ribbon": "#f08aa8", "opacity": 0.45 }
   ],
   "flowers": [
-    { "id": "f1", "name": "Червона троянда", "price": 90, "image": "🌹" },
-    { "id": "f2", "name": "Біла тюльпана", "price": 60, "image": "🌷" },
-    { "id": "f3", "name": "Півонія", "price": 140, "image": "🌸" },
-    { "id": "f4", "name": "Гілочка евкаліпта", "price": 45, "image": "🌿" }
+    { "id": "f1", "name": "Червона троянда", "price": 90, "image": "🌹", "kind": "rose", "color": "#c1121f" },
+    { "id": "f2", "name": "Біла тюльпана", "price": 60, "image": "🌷", "kind": "tulip", "color": "#f4f1ea" },
+    { "id": "f3", "name": "Півонія", "price": 140, "image": "🌸", "kind": "peony", "color": "#f4a6c0" },
+    { "id": "f4", "name": "Гілочка евкаліпта", "price": 45, "image": "🌿", "kind": "leaf", "color": "#7fa98a" }
   ]
 }
