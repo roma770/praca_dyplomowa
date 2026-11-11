@@ -1,9 +1,10 @@
 {
   "freeDeliveryFrom": 2000,
+  "currency": "zł",
   "zones": [
-    { "id": "center", "name": "Центр міста", "price": 80 },
-    { "id": "suburbs", "name": "Спальні райони", "price": 120 },
-    { "id": "outskirts", "name": "Передмістя (до 15 км)", "price": 200 }
+    { "id": "center", "name": "Centrum miasta", "price": 80 },
+    { "id": "suburbs", "name": "Dzielnice poza centrum", "price": 120 },
+    { "id": "outskirts", "name": "Okolice miasta (do 15 km)", "price": 200 }
   ],
   "slots": ["09:00–12:00", "12:00–15:00", "15:00–18:00", "18:00–21:00"]
 }

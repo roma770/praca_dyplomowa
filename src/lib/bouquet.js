@@ -30,7 +30,7 @@ export const bouquetToCartItem = (wrapper, selectedFlowers) => {
   const { total, composition } = calcBouquet(wrapper, selectedFlowers);
   return {
     id: `custom-${Date.now()}`,
-    name: 'Авторський букет',
+    name: 'Bukiet skomponowany przez Ciebie',
     description: composition,
     price: total,
     image: BOUQUET_IMAGE,

@@ -14,7 +14,7 @@ export const ProductCard = ({ product }) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-rose-600 shadow-sm">
-          {product.price} грн
+          {product.price} zł
         </div>
       </div>
       
@@ -27,7 +27,7 @@ export const ProductCard = ({ product }) => {
           className="w-full flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-semibold py-2.5 rounded-xl transition-colors"
         >
           <ShoppingCart size={18} />
-          У кошик
+          Dodaj do koszyka
         </button>
       </div>
     </div>

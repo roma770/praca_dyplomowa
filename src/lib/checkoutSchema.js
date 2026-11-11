@@ -7,20 +7,20 @@ export const todayISO = () => new Date().toLocaleDateString('sv-SE');
 const zoneIds = delivery.zones.map((z) => z.id);
 
 export const checkoutSchema = z.object({
-  name: z.string().trim().min(2, 'Вкажіть ваше ім’я'),
+  name: z.string().trim().min(2, 'Podaj imię i nazwisko.'),
   phone: z
     .string()
     .trim()
-    .regex(/^\+?[0-9\s()-]{9,16}$/, 'Вкажіть коректний номер телефону'),
-  email: z.email('Невірний формат email').or(z.literal('')),
+    .regex(/^\+?[0-9\s()-]{9,16}$/, 'Podaj prawidłowy numer telefonu.'),
+  email: z.email('Podaj prawidłowy adres e-mail.').or(z.literal('')),
 
-  recipientName: z.string().trim().min(2, 'Вкажіть ім’я отримувача'),
-  address: z.string().trim().min(5, 'Вкажіть адресу доставки'),
-  zone: z.string().refine((v) => zoneIds.includes(v), 'Оберіть зону доставки'),
+  recipientName: z.string().trim().min(2, 'Podaj imię odbiorcy.'),
+  address: z.string().trim().min(5, 'Podaj adres dostawy.'),
+  zone: z.string().refine((v) => zoneIds.includes(v), 'Wybierz obszar dostawy.'),
   date: z
     .string()
-    .min(1, 'Оберіть дату доставки')
-    .refine((v) => v >= todayISO(), 'Дата не може бути в минулому'),
-  slot: z.string().min(1, 'Оберіть проміжок часу'),
-  cardText: z.string().max(200, 'Не більше 200 символів').optional(),
+    .min(1, 'Wybierz datę dostawy.')
+    .refine((v) => v >= todayISO(), 'Data dostawy nie może przypadać w przeszłości.'),
+  slot: z.string().min(1, 'Wybierz przedział godzinowy.'),
+  cardText: z.string().max(200, 'Wiadomość może mieć maksymalnie 200 znaków.').optional(),
 });

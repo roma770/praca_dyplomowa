@@ -13,10 +13,10 @@ export const MensSection = () => {
       <div className="bg-slate-900 py-16 mb-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 uppercase tracking-wide">
-            Справжні <span className="text-amber-500">Чоловічі</span> Букети
+            Bukiety <span className="text-amber-500">dla niego</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Здивуйте його оригінальним смачним подарунком. Мисливські ковбаски, сири, горіхи та снеки — ідеальне доповнення до свята.
+            Szukasz prezentu z charakterem? Wybierz zestaw z dobrymi przekąskami i dodatkami, który sprawdzi się na urodziny, rocznicę lub bez okazji.
           </p>
         </div>
       </div>

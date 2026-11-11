@@ -27,7 +27,7 @@ const CartItemRow = ({ item }) => {
       <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-gray-800 truncate">{item.name}</div>
-        <div className="text-sm text-gray-500">{item.price} грн</div>
+        <div className="text-sm text-gray-500">{item.price} zł</div>
         {item.description && item.id.startsWith('custom-') && (
           <div className="text-xs text-gray-400 truncate">{item.description}</div>
         )}
@@ -36,7 +36,7 @@ const CartItemRow = ({ item }) => {
         <button
           type="button"
           onClick={() => updateQuantity(item.id, -1)}
-          aria-label="Менше"
+          aria-label="Zmniejsz liczbę sztuk"
           className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
         >
           <Minus size={14} />
@@ -45,17 +45,17 @@ const CartItemRow = ({ item }) => {
         <button
           type="button"
           onClick={() => updateQuantity(item.id, 1)}
-          aria-label="Більше"
+          aria-label="Zwiększ liczbę sztuk"
           className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
         >
           <Plus size={14} />
         </button>
       </div>
-      <div className="w-20 text-right font-bold">{item.price * item.quantity} грн</div>
+      <div className="w-20 text-right font-bold">{item.price * item.quantity} zł</div>
       <button
         type="button"
         onClick={() => removeFromCart(item.id)}
-        aria-label="Видалити"
+        aria-label="Usuń produkt"
         className="text-gray-400 hover:text-rose-500"
       >
         <Trash2 size={18} />
@@ -115,10 +115,10 @@ export const Checkout = () => {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center">
         <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Ваш кошик порожній</h1>
-        <p className="text-gray-500 mb-6">Додайте букет або подарунок, щоб оформити замовлення.</p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Twój koszyk jest pusty</h1>
+        <p className="text-gray-500 mb-6">Wybierz bukiet lub upominek, a potem wróć, by złożyć zamówienie.</p>
         <Link to="/" className="inline-block bg-rose-500 hover:bg-rose-600 text-white px-6 py-3 rounded-xl font-semibold">
-          До каталогу
+          Zobacz ofertę
         </Link>
       </div>
     );
@@ -126,13 +126,13 @@ export const Checkout = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Оформлення замовлення</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Dane do zamówienia</h1>
 
       <div className="grid lg:grid-cols-3 gap-8 items-start">
         {/* Левая колонка: товары + форма */}
         <div className="lg:col-span-2 space-y-8">
           <section className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-2">Ваше замовлення</h2>
+            <h2 className="text-lg font-bold text-gray-800 mb-2">Twoje produkty</h2>
             <div className="divide-y divide-gray-100">
               {cart.map((item) => (
                 <CartItemRow key={item.id} item={item} />
@@ -145,11 +145,11 @@ export const Checkout = () => {
                     <div className="text-xs text-rose-500 font-semibold">{addedEvent.type}</div>
                     <div className="font-semibold text-gray-800 truncate">{addedEvent.title}</div>
                   </div>
-                  <div className="w-20 text-right font-bold">{addedEvent.price} грн</div>
+                  <div className="w-20 text-right font-bold">{addedEvent.price} zł</div>
                   <button
                     type="button"
                     onClick={removeEvent}
-                    aria-label="Прибрати подарунок"
+                    aria-label="Usuń dodatek"
                     className="text-gray-400 hover:text-rose-500"
                   >
                     <Trash2 size={18} />
@@ -161,16 +161,16 @@ export const Checkout = () => {
 
           <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-8">
             <section className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Ваші контакти</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Dane kontaktowe</h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Ім’я" error={errors.name}>
-                  <input {...register('name')} className={inputClass} placeholder="Олександр" />
+                <Field label="Imię i nazwisko" error={errors.name}>
+                  <input {...register('name')} className={inputClass} placeholder="Aleksandra Nowak" />
                 </Field>
-                <Field label="Телефон" error={errors.phone}>
-                  <input {...register('phone')} className={inputClass} placeholder="+380 50 123 45 67" />
+                <Field label="Numer telefonu" error={errors.phone}>
+                  <input {...register('phone')} className={inputClass} placeholder="+48 500 123 456" />
                 </Field>
                 <div className="sm:col-span-2">
-                  <Field label="Email (необов’язково)" error={errors.email}>
+                  <Field label="Adres e-mail (opcjonalnie)" error={errors.email}>
                     <input {...register('email')} className={inputClass} placeholder="name@example.com" />
                   </Field>
                 </div>
@@ -180,33 +180,33 @@ export const Checkout = () => {
             <section className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="flex items-center gap-2 text-lg font-bold text-gray-800 mb-4">
                 <Truck size={20} className="text-rose-500" />
-                Доставка кур’єром
+                Dostawa pod wskazany adres
               </h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Ім’я отримувача" error={errors.recipientName}>
-                  <input {...register('recipientName')} className={inputClass} placeholder="Марія" />
+                <Field label="Imię i nazwisko odbiorcy" error={errors.recipientName}>
+                  <input {...register('recipientName')} className={inputClass} placeholder="Maria Kowalska" />
                 </Field>
-                <Field label="Зона доставки" error={errors.zone}>
+                <Field label="Obszar dostawy" error={errors.zone}>
                   <select {...register('zone')} className={inputClass}>
-                    <option value="">Оберіть зону</option>
+                    <option value="">Wybierz obszar</option>
                     {delivery.zones.map((z) => (
                       <option key={z.id} value={z.id}>
-                        {z.name} — {z.price} грн
+                        {z.name} — {z.price} zł
                       </option>
                     ))}
                   </select>
                 </Field>
                 <div className="sm:col-span-2">
-                  <Field label="Адреса (вулиця, будинок, квартира)" error={errors.address}>
-                    <input {...register('address')} className={inputClass} placeholder="вул. Квітуча, 12, кв. 5" />
+                  <Field label="Adres (ulica, numer domu i mieszkania)" error={errors.address}>
+                    <input {...register('address')} className={inputClass} placeholder="ul. Kwiatowa 12/5" />
                   </Field>
                 </div>
-                <Field label="Дата доставки" error={errors.date}>
+                <Field label="Data dostawy" error={errors.date}>
                   <input type="date" min={todayISO()} {...register('date')} className={inputClass} />
                 </Field>
-                <Field label="Час доставки" error={errors.slot}>
+                <Field label="Przedział godzinowy" error={errors.slot}>
                   <select {...register('slot')} className={inputClass}>
-                    <option value="">Оберіть проміжок</option>
+                    <option value="">Wybierz godzinę</option>
                     {delivery.slots.map((s) => (
                       <option key={s} value={s}>
                         {s}
@@ -215,12 +215,12 @@ export const Checkout = () => {
                   </select>
                 </Field>
                 <div className="sm:col-span-2">
-                  <Field label="Текст листівки (необов’язково)" error={errors.cardText}>
+                  <Field label="Wiadomość na bileciku (opcjonalnie)" error={errors.cardText}>
                     <textarea
                       {...register('cardText')}
                       rows={3}
                       className={inputClass}
-                      placeholder="З днем народження! Бажаю тобі..."
+                      placeholder="Wszystkiego najlepszego! Niech każdy dzień przynosi Ci radość…"
                     />
                   </Field>
                 </div>
@@ -231,42 +231,42 @@ export const Checkout = () => {
 
         {/* Правая колонка: итог */}
         <aside className="bg-white rounded-2xl border border-gray-100 p-6 lg:sticky lg:top-24">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Разом</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Podsumowanie</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-gray-500">Товари</dt>
-              <dd>{totals.itemsTotal} грн</dd>
+              <dt className="text-gray-500">Produkty</dt>
+              <dd>{totals.itemsTotal} zł</dd>
             </div>
             {addedEvent && (
               <div className="flex justify-between">
-                <dt className="text-gray-500">Подарунок-враження</dt>
-                <dd>{totals.eventTotal} грн</dd>
+                <dt className="text-gray-500">Dodatkowy upominek</dt>
+                <dd>{totals.eventTotal} zł</dd>
               </div>
             )}
             <div className="flex justify-between">
-              <dt className="text-gray-500">Доставка</dt>
+              <dt className="text-gray-500">Dostawa</dt>
               <dd>
                 {!zoneId
-                  ? 'оберіть зону'
+                  ? 'wybierz obszar'
                   : totals.isFreeDelivery
-                    ? 'безкоштовно'
-                    : `${totals.deliveryPrice} грн`}
+                    ? 'bezpłatna'
+                    : `${totals.deliveryPrice} zł`}
               </dd>
             </div>
           </dl>
           <div className="flex justify-between text-xl font-bold border-t border-gray-100 mt-4 pt-4">
-            <span>До сплати</span>
-            <span className="text-rose-600">{totals.total} грн</span>
+            <span>Do zapłaty</span>
+            <span className="text-rose-600">{totals.total} zł</span>
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Безкоштовна доставка від {delivery.freeDeliveryFrom} грн. Оплата кур’єру при отриманні.
+            Dostawa gratis przy zamówieniach od {delivery.freeDeliveryFrom} zł. Płatność u kuriera przy odbiorze.
           </p>
           <button
             type="submit"
             form="checkout-form"
             className="w-full mt-5 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition-colors"
           >
-            Підтвердити замовлення
+            Złóż zamówienie
           </button>
         </aside>
       </div>

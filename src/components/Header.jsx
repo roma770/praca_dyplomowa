@@ -18,14 +18,14 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 font-medium text-gray-600 text-sm">
-          <Link to="/" className="hover:text-rose-500 transition">Каталог</Link>
+          <Link to="/" className="hover:text-rose-500 transition">Kwiaty i prezenty</Link>
           <Link to="/builder" className="hover:text-rose-500 transition flex items-center gap-1 text-rose-600 font-semibold">
             <Sparkles size={16} />
-            Скласти свій букет
+            Stwórz własny bukiet
           </Link>
           <Link to="/mens" className="hover:text-amber-600 transition flex items-center gap-1 font-semibold text-gray-800">
             <UserCheck size={16} />
-            Чоловічий розділ
+            Bukiety dla niego
           </Link>
         </nav>
 

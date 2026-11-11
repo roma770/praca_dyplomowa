@@ -28,7 +28,7 @@ export const EventModal = () => {
           >
             <button
               onClick={closeEventModal}
-              aria-label="Закрити"
+              aria-label="Zamknij"
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
             >
               <X size={24} />
@@ -36,14 +36,14 @@ export const EventModal = () => {
 
             <div className="flex items-center gap-2 text-rose-500 font-bold mb-2">
               <Sparkles size={20} />
-              <span>Зробіть вечір незабутнім!</span>
+              <span>Dodaj wyjątkowy akcent do prezentu</span>
             </div>
 
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Додайте до квітів сертифікат на відпочинок
+              Podarujcie sobie wspólny czas
             </h2>
             <p className="text-gray-600 mb-6 text-sm">
-              Спеціальна пропозиція при замовленні букета: обирайте заклади зі знижкою.
+              Do bukietu możesz dołączyć zaproszenie na kolację lub wspólny seans.
             </p>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -64,12 +64,12 @@ export const EventModal = () => {
                     <h3 className="font-bold text-gray-800 text-base mt-2">{event.title}</h3>
                     <p className="text-xs text-green-600 font-medium mt-1">{event.discount}</p>
                     <div className="mt-4 flex items-center justify-between">
-                      <span className="font-bold text-gray-900">{event.price} грн</span>
+                      <span className="font-bold text-gray-900">{event.price} zł</span>
                       <button
                         onClick={() => addEventToCart(event)}
                         className="bg-rose-500 hover:bg-rose-600 text-white text-xs px-3 py-2 rounded-lg transition"
                       >
-                        Додати до дарунка
+                        Dodaj do zestawu
                       </button>
                     </div>
                   </div>
@@ -81,7 +81,7 @@ export const EventModal = () => {
               onClick={closeEventModal}
               className="w-full mt-6 py-2 border border-gray-300 rounded-xl text-gray-600 text-sm hover:bg-gray-50"
             >
-              Ні дякую, тільки квіти
+              Dziękuję, zostaję przy kwiatach
             </button>
           </motion.div>
         </motion.div>

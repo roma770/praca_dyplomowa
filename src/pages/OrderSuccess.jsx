@@ -10,9 +10,9 @@ export const OrderSuccess = () => {
   if (!order) {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Замовлення не знайдено</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Nie znaleźliśmy tego zamówienia</h1>
         <Link to="/" className="text-rose-500 underline">
-          На головну
+          Wróć na stronę główną
         </Link>
       </div>
     );
@@ -24,16 +24,16 @@ export const OrderSuccess = () => {
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <CheckCircle2 size={56} className="mx-auto text-green-500 mb-4" />
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Дякуємо, {customer.name}!</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dziękujemy, {customer.name}!</h1>
         <p className="text-gray-500">
-          Замовлення <span className="font-bold text-gray-800">{order.id}</span> прийнято. Ми зателефонуємо
-          вам для підтвердження.
+          Przyjęliśmy zamówienie <span className="font-bold text-gray-800">{order.id}</span>. Skontaktujemy się
+          z Tobą telefonicznie, aby potwierdzić szczegóły.
         </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-6">
         <section>
-          <h2 className="font-bold text-gray-800 mb-2">Склад замовлення</h2>
+          <h2 className="font-bold text-gray-800 mb-2">Zamówione produkty</h2>
           <ul className="text-sm space-y-1">
             {order.items.map((i) => (
               <li key={i.id} className="flex justify-between gap-4">
@@ -43,41 +43,41 @@ export const OrderSuccess = () => {
                     <span className="block text-xs text-gray-400">{i.description}</span>
                   )}
                 </span>
-                <span>{i.price * i.quantity} грн</span>
+                <span>{i.price * i.quantity} zł</span>
               </li>
             ))}
             {order.event && (
               <li className="flex justify-between">
                 <span>{order.event.title}</span>
-                <span>{order.event.price} грн</span>
+                <span>{order.event.price} zł</span>
               </li>
             )}
           </ul>
         </section>
 
         <section>
-          <h2 className="font-bold text-gray-800 mb-2">Доставка</h2>
+          <h2 className="font-bold text-gray-800 mb-2">Szczegóły dostawy</h2>
           <p className="text-sm text-gray-600">
             {formatDate(delivery.date)}, {delivery.slot}
             <br />
             {delivery.address} ({delivery.zoneName})
             <br />
-            Отримувач: {delivery.recipientName}
+            Odbiorca: {delivery.recipientName}
           </p>
           {delivery.cardText && (
-            <p className="text-sm text-gray-500 italic mt-2">Листівка: «{delivery.cardText}»</p>
+            <p className="text-sm text-gray-500 italic mt-2">Wiadomość na bileciku: „{delivery.cardText}”</p>
           )}
         </section>
 
         <div className="flex justify-between text-xl font-bold border-t border-gray-100 pt-4">
-          <span>Разом до сплати</span>
-          <span className="text-rose-600">{totals.total} грн</span>
+          <span>Łącznie do zapłaty</span>
+          <span className="text-rose-600">{totals.total} zł</span>
         </div>
       </div>
 
       <div className="text-center mt-8">
         <Link to="/" className="inline-block bg-rose-500 hover:bg-rose-600 text-white px-6 py-3 rounded-xl font-semibold">
-          Продовжити покупки
+          Wróć do oferty
         </Link>
       </div>
     </div>
