@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -5,6 +6,7 @@ import { Minus, Plus, Trash2, ShoppingBag, Truck } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { checkoutSchema, todayISO } from '../lib/checkoutSchema';
 import { calcTotals } from '../lib/pricing';
+import { isOrderApiEnabled, submitOrder } from '../lib/orderApi';
 import delivery from '../data/delivery.json';
 
 const inputClass =
@@ -70,6 +72,8 @@ export const Checkout = () => {
   const addedEvent = useCartStore((s) => s.addedEvent);
   const removeEvent = useCartStore((s) => s.removeEvent);
   const placeOrder = useCartStore((s) => s.placeOrder);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -94,9 +98,11 @@ export const Checkout = () => {
   const zoneId = useWatch({ control, name: 'zone' });
   const totals = calcTotals(cart, addedEvent, zoneId);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    setSubmitError('');
+    setIsSubmitting(true);
     const zone = delivery.zones.find((z) => z.id === data.zone);
-    const orderId = placeOrder({
+    const orderDetails = {
       customer: { name: data.name, phone: data.phone, email: data.email },
       delivery: {
         recipientName: data.recipientName,
@@ -106,9 +112,22 @@ export const Checkout = () => {
         slot: data.slot,
         cardText: data.cardText,
       },
+      items: cart,
+      event: addedEvent,
       totals,
-    });
-    navigate(`/order/${orderId}`);
+    };
+
+    try {
+      const savedOrder = isOrderApiEnabled
+        ? await submitOrder(orderDetails)
+        : orderDetails;
+      const orderId = placeOrder(savedOrder);
+      navigate(`/order/${orderId}`);
+    } catch (error) {
+      setSubmitError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -261,12 +280,18 @@ export const Checkout = () => {
           <p className="text-xs text-gray-400 mt-2">
             Dostawa gratis przy zamówieniach od {delivery.freeDeliveryFrom} zł. Płatność u kuriera przy odbiorze.
           </p>
+          {submitError && (
+            <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              {submitError}
+            </p>
+          )}
           <button
             type="submit"
             form="checkout-form"
-            className="w-full mt-5 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition-colors"
+            disabled={isSubmitting}
+            className="w-full mt-5 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition-colors disabled:cursor-wait disabled:opacity-60"
           >
-            Złóż zamówienie
+            {isSubmitting ? 'Zapisywanie zamówienia…' : 'Złóż zamówienie'}
           </button>
         </aside>
       </div>

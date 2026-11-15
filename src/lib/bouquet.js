@@ -34,5 +34,9 @@ export const bouquetToCartItem = (wrapper, selectedFlowers) => {
     description: composition,
     price: total,
     image: BOUQUET_IMAGE,
+    bouquetConfig: {
+      wrapperId: wrapper.id,
+      flowers: { ...selectedFlowers },
+    },
   };
 };

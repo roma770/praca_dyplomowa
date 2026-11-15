@@ -45,13 +45,14 @@ export const useCartStore = create(
 
       closeEventModal: () => set({ isEventModalOpen: false, eventDeclined: true }),
 
-      // Сохраняет заказ в историю, очищает корзину и возвращает номер заказа
+      // Сохраняет локальную копию заказа, очищает корзину и возвращает номер заказа
       placeOrder: (details) => {
         const { cart, addedEvent } = get();
-        const id = `BJ-${Date.now().toString().slice(-6)}`;
+        const id = details.id || `BJ-${Date.now().toString().slice(-6)}`;
         const order = {
           id,
-          createdAt: new Date().toISOString(),
+          createdAt: details.createdAt || new Date().toISOString(),
+          status: details.status || 'new',
           items: cart,
           event: addedEvent,
           ...details,

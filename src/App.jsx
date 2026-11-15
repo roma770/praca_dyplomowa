@@ -7,6 +7,7 @@ import { MensSection } from './pages/MensSection';
 import { Builder } from './pages/Builder';
 import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
+import { Admin } from './pages/Admin';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/mens" element={<MensSection />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderSuccess />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer />
