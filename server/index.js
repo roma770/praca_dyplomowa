@@ -1,4 +1,4 @@
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -27,6 +27,8 @@ if (!adminPassword) {
   console.error('Set BLOOM_ADMIN_PASSWORD in .env before starting the API server.');
   process.exit(1);
 }
+const adminEmail = (process.env.BLOOM_ADMIN_EMAIL || 'admin@bloom-joy.local').trim().toLowerCase();
+const adminName = (process.env.BLOOM_ADMIN_NAME || 'Administrator').trim();
 
 const readJson = (relativePath) =>
   JSON.parse(readFileSync(resolve(projectRoot, relativePath), 'utf8'));
@@ -61,7 +63,49 @@ database.exec(`
     event_json TEXT,
     totals_json TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    password_salt TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('customer', 'admin')),
+    created_at TEXT NOT NULL
+  );
 `);
+
+const passwordRecord = (password) => {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return { salt, hash };
+};
+
+const verifyPassword = (password, salt, expectedHash) => {
+  const actual = Buffer.from(scryptSync(password, salt, 64).toString('hex'), 'hex');
+  const expected = Buffer.from(expectedHash, 'hex');
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+};
+
+const userByEmail = database.prepare('SELECT * FROM users WHERE email = ?');
+const insertUser = database.prepare(
+  `INSERT INTO users (id, name, email, password_salt, password_hash, role, created_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?)`
+);
+const configuredAdmin = userByEmail.get(adminEmail);
+if (configuredAdmin) {
+  database.prepare('UPDATE users SET role = ? WHERE id = ?').run('admin', configuredAdmin.id);
+} else {
+  const credentials = passwordRecord(adminPassword);
+  insertUser.run(
+    `USR-${randomBytes(8).toString('hex').toUpperCase()}`,
+    adminName,
+    adminEmail,
+    credentials.salt,
+    credentials.hash,
+    'admin',
+    new Date().toISOString()
+  );
+}
 
 const sessions = new Map();
 const loginAttempts = new Map();
@@ -284,21 +328,64 @@ const createOrder = (payload) => {
   return order;
 };
 
-const tokenFromRequest = (request) => {
+const userFromRow = (row) => ({
+  id: row.id,
+  name: row.name,
+  email: row.email,
+  role: row.role,
+  createdAt: row.created_at,
+});
+
+const sessionFromRequest = (request) => {
   const match = request.headers.authorization?.match(/^Bearer (.+)$/i);
   if (!match) return null;
-  const expiresAt = sessions.get(match[1]);
-  if (!expiresAt || expiresAt <= Date.now()) {
+  const session = sessions.get(match[1]);
+  if (!session || session.expiresAt <= Date.now()) {
     sessions.delete(match[1]);
     return null;
   }
-  return match[1];
+  const user = database.prepare('SELECT * FROM users WHERE id = ?').get(session.userId);
+  if (!user) {
+    sessions.delete(match[1]);
+    return null;
+  }
+  return { token: match[1], user: userFromRow(user) };
 };
 
-const passwordsMatch = (candidate) => {
-  const expectedHash = createHash('sha256').update(adminPassword).digest();
-  const candidateHash = createHash('sha256').update(candidate).digest();
-  return timingSafeEqual(expectedHash, candidateHash);
+const createSession = (row) => {
+  const token = randomBytes(32).toString('base64url');
+  sessions.set(token, { userId: row.id, expiresAt: Date.now() + sessionLifetimeMs });
+  return { token, expiresIn: sessionLifetimeMs, user: userFromRow(row) };
+};
+
+const normalizeEmail = (value) => {
+  const email = validateText(value, 'Email', 160).toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw Object.assign(new Error('Enter a valid email address.'), { statusCode: 400 });
+  }
+  return email;
+};
+
+const validatePassword = (value) => {
+  if (typeof value !== 'string' || value.length < 8 || value.length > 128) {
+    throw Object.assign(new Error('Password must be between 8 and 128 characters.'), { statusCode: 400 });
+  }
+  return value;
+};
+
+const loginAttempt = (request) => {
+  const key = request.socket.remoteAddress || 'unknown';
+  const state = loginAttempts.get(key) || { count: 0, blockedUntil: 0 };
+  return { key, state };
+};
+
+const recordLoginFailure = (key, state) => {
+  state.count += 1;
+  if (state.count >= 5) {
+    state.count = 0;
+    state.blockedUntil = Date.now() + 15 * 60 * 1000;
+  }
+  loginAttempts.set(key, state);
 };
 
 const server = createServer(async (request, response) => {
@@ -322,49 +409,92 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === 'POST' && path === '/api/auth/register') {
+      const payload = await readRequestJson(request);
+      const name = validateText(payload.name, 'Name', 100);
+      const email = normalizeEmail(payload.email);
+      const password = validatePassword(payload.password);
+      if (userByEmail.get(email)) {
+        sendJson(response, 409, { error: 'An account with this email already exists.' });
+        return;
+      }
+
+      const credentials = passwordRecord(password);
+      insertUser.run(
+        `USR-${randomBytes(8).toString('hex').toUpperCase()}`,
+        name,
+        email,
+        credentials.salt,
+        credentials.hash,
+        'customer',
+        new Date().toISOString()
+      );
+      sendJson(response, 201, createSession(userByEmail.get(email)));
+      return;
+    }
+
+    if (request.method === 'POST' && path === '/api/auth/login') {
+      const { key, state } = loginAttempt(request);
+      if (state.blockedUntil > Date.now()) {
+        sendJson(response, 429, { error: 'Too many attempts. Try again in 15 minutes.' });
+        return;
+      }
+
+      const payload = await readRequestJson(request);
+      const email = typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : '';
+      const row = email ? userByEmail.get(email) : null;
+      const password =
+        typeof payload.password === 'string' && payload.password.length <= 128
+          ? payload.password
+          : '';
+      const fallback = passwordRecord(adminPassword);
+      const passwordIsValid = verifyPassword(
+        password,
+        row?.password_salt || fallback.salt,
+        row?.password_hash || fallback.hash
+      );
+      if (!row || password.length < 8 || !passwordIsValid) {
+        recordLoginFailure(key, state);
+        sendJson(response, 401, { error: 'Email lub hasło są nieprawidłowe.' });
+        return;
+      }
+
+      loginAttempts.delete(key);
+      sendJson(response, 200, createSession(row));
+      return;
+    }
+
+    if (request.method === 'GET' && path === '/api/auth/me') {
+      const session = sessionFromRequest(request);
+      if (!session) {
+        sendJson(response, 401, { error: 'Please sign in again.' });
+        return;
+      }
+      sendJson(response, 200, { user: session.user });
+      return;
+    }
+
+    if (request.method === 'POST' && path === '/api/auth/logout') {
+      const session = sessionFromRequest(request);
+      if (session) sessions.delete(session.token);
+      sendJson(response, 200, { ok: true });
+      return;
+    }
+
     if (request.method === 'POST' && path === '/api/orders') {
       const order = createOrder(await readRequestJson(request));
       sendJson(response, 201, { order });
       return;
     }
 
-    if (request.method === 'POST' && path === '/api/admin/login') {
-      const address = request.socket.remoteAddress || 'unknown';
-      const attempts = loginAttempts.get(address) || { count: 0, blockedUntil: 0 };
-      if (attempts.blockedUntil > Date.now()) {
-        sendJson(response, 429, { error: 'Too many attempts. Try again in 15 minutes.' });
-        return;
-      }
-
-      const payload = await readRequestJson(request);
-      if (typeof payload.password !== 'string' || !passwordsMatch(payload.password)) {
-        attempts.count += 1;
-        if (attempts.count >= 5) {
-          attempts.count = 0;
-          attempts.blockedUntil = Date.now() + 15 * 60 * 1000;
-        }
-        loginAttempts.set(address, attempts);
-        sendJson(response, 401, { error: 'Incorrect password.' });
-        return;
-      }
-
-      loginAttempts.delete(address);
-      const token = randomBytes(32).toString('base64url');
-      sessions.set(token, Date.now() + sessionLifetimeMs);
-      sendJson(response, 200, { token, expiresIn: sessionLifetimeMs });
-      return;
-    }
-
     if (path.startsWith('/api/admin/')) {
-      const token = tokenFromRequest(request);
-      if (!token) {
+      const session = sessionFromRequest(request);
+      if (!session) {
         sendJson(response, 401, { error: 'Sign in to access the administration panel.' });
         return;
       }
-
-      if (request.method === 'POST' && path === '/api/admin/logout') {
-        sessions.delete(token);
-        sendJson(response, 200, { ok: true });
+      if (session.user.role !== 'admin') {
+        sendJson(response, 403, { error: 'Administrator access is required.' });
         return;
       }
 

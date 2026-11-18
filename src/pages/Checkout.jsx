@@ -7,6 +7,7 @@ import { useCartStore } from '../store/useCartStore';
 import { checkoutSchema, todayISO } from '../lib/checkoutSchema';
 import { calcTotals } from '../lib/pricing';
 import { isOrderApiEnabled, submitOrder } from '../lib/orderApi';
+import { useAuthStore } from '../store/useAuthStore';
 import delivery from '../data/delivery.json';
 
 const inputClass =
@@ -72,6 +73,7 @@ export const Checkout = () => {
   const addedEvent = useCartStore((s) => s.addedEvent);
   const removeEvent = useCartStore((s) => s.removeEvent);
   const placeOrder = useCartStore((s) => s.placeOrder);
+  const accountUser = useAuthStore((s) => s.user);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,9 +85,9 @@ export const Checkout = () => {
   } = useForm({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      name: '',
+      name: accountUser?.name || '',
       phone: '',
-      email: '',
+      email: accountUser?.email || '',
       recipientName: '',
       address: '',
       zone: '',

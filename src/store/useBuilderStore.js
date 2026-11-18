@@ -7,7 +7,7 @@ export const useBuilderStore = create((set) => ({
 
   setWrapper: (wrapper) => set({ selectedWrapper: wrapper }),
 
-  // Не даём собрать больше maxFlowers цветов (иначе букет не поместится в упаковку)
+  
   addFlower: (flowerId) =>
     set((state) => {
       const total = Object.values(state.selectedFlowers).reduce((sum, n) => sum + n, 0);

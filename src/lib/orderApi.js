@@ -26,11 +26,18 @@ export const submitOrder = async (order) => {
   return savedOrder;
 };
 
-export const adminLogin = (password) =>
-  request('/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
+export const registerAccount = (profile) =>
+  request('/auth/register', { method: 'POST', body: JSON.stringify(profile) });
 
-export const adminLogout = (token) =>
-  request('/admin/logout', { method: 'POST', token });
+export const loginAccount = (email, password) =>
+  request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+
+export const fetchCurrentUser = async (token) => {
+  const { user } = await request('/auth/me', { token });
+  return user;
+};
+
+export const logoutAccount = (token) => request('/auth/logout', { method: 'POST', token });
 
 export const fetchAdminOrders = async (token) => {
   const { orders } = await request('/admin/orders', { token });

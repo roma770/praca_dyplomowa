@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { KeyRound, LogOut, RefreshCw, ShieldCheck, Truck } from 'lucide-react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { LogOut, RefreshCw, ShieldCheck, Truck } from 'lucide-react';
 import {
-  adminLogin,
-  adminLogout,
   fetchAdminOrders,
   isOrderApiEnabled,
   updateOrderStatus,
 } from '../lib/orderApi';
+import { useAuthStore } from '../store/useAuthStore';
 
 const statuses = [
   { value: 'new', label: 'Nowe' },
@@ -124,8 +124,12 @@ const OrderCard = ({ order, onStatusChange, saving }) => (
 );
 
 export const Admin = () => {
-  const [token, setToken] = useState(() => sessionStorage.getItem('bloom-joy-admin-token'));
-  const [password, setPassword] = useState('');
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const clearSession = useAuthStore((state) => state.clearSession);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [savingOrderId, setSavingOrderId] = useState('');
@@ -139,41 +143,21 @@ export const Admin = () => {
       setOrders(await fetchAdminOrders(activeToken));
     } catch (loadError) {
       if (loadError.message.includes('Sign in')) {
-        sessionStorage.removeItem('bloom-joy-admin-token');
-        setToken('');
+        clearSession();
       }
       setError(loadError.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [clearSession]);
 
   useEffect(() => {
     if (token) loadOrders(token);
   }, [token, loadOrders]);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const result = await adminLogin(password);
-      sessionStorage.setItem('bloom-joy-admin-token', result.token);
-      setToken(result.token);
-      setPassword('');
-    } catch (loginError) {
-      setError(loginError.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
-    if (token) await adminLogout(token).catch(() => {});
-    sessionStorage.removeItem('bloom-joy-admin-token');
-    setToken('');
-    setOrders([]);
-    setError('');
+    await logout();
+    navigate('/account', { replace: true });
   };
 
   const handleStatusChange = async (orderId, status) => {
@@ -189,6 +173,31 @@ export const Admin = () => {
     }
   };
 
+  if (!isOrderApiEnabled) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm leading-6 text-amber-900">
+          Panel wymaga połączenia z serwerem kont i zamówień. Skonfiguruj adres API dla opublikowanej strony.
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !token) {
+    return <Navigate to="/account" replace state={{ from: location }} />;
+  }
+
+  if (user.role !== 'admin') {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+        <ShieldCheck size={44} className="mx-auto text-rose-400" />
+        <h1 className="mt-4 text-2xl font-bold text-gray-900">Brak dostępu do panelu</h1>
+        <p className="mt-2 text-gray-500">To konto nie ma uprawnień administratora.</p>
+        <Link to="/" className="mt-5 inline-block text-rose-600 underline">Wróć do sklepu</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[65vh] bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
@@ -199,7 +208,7 @@ export const Admin = () => {
               Strefa administracyjna
             </p>
             <h1 className="text-3xl font-bold text-gray-900">Zamówienia</h1>
-            <p className="mt-2 text-gray-500">Przeglądaj zamówienia i aktualizuj ich status.</p>
+            <p className="mt-2 text-gray-500">Zalogowano jako {user.email}. Przeglądaj zamówienia i aktualizuj ich status.</p>
           </div>
 
           {token && (
@@ -225,62 +234,26 @@ export const Admin = () => {
           )}
         </div>
 
-        {!isOrderApiEnabled ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm leading-6 text-amber-900">
-            Panel wymaga połączenia z serwerem zamówień. W wersji opublikowanej ustaw zmienną
-            <code className="mx-1 rounded bg-amber-100 px-1.5 py-0.5">VITE_API_URL</code>
-            dla procesu budowania GitHub Actions i uruchom osobno serwer API.
+        {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+        {loading && orders.length === 0 ? (
+          <div className="rounded-2xl bg-white p-8 text-center text-gray-500">Ładowanie zamówień…</div>
+        ) : orders.length === 0 ? (
+          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center">
+            <h2 className="text-lg font-bold text-gray-800">Nie ma jeszcze zamówień</h2>
+            <p className="mt-2 text-sm text-gray-500">Nowe zamówienia pojawią się tutaj po złożeniu przez klienta.</p>
           </div>
-        ) : !token ? (
-          <form onSubmit={handleLogin} className="max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <label htmlFor="admin-password" className="mb-2 block text-sm font-semibold text-gray-700">
-              Hasło administratora
-            </label>
-            <div className="relative">
-              <KeyRound size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                id="admin-password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className={`${inputClass} pl-10`}
-                required
-              />
-            </div>
-            {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="mt-4 w-full rounded-xl bg-rose-500 px-4 py-3 font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? 'Logowanie…' : 'Zaloguj się'}
-            </button>
-          </form>
         ) : (
-          <>
-            {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-            {loading && orders.length === 0 ? (
-              <div className="rounded-2xl bg-white p-8 text-center text-gray-500">Ładowanie zamówień…</div>
-            ) : orders.length === 0 ? (
-              <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center">
-                <h2 className="text-lg font-bold text-gray-800">Nie ma jeszcze zamówień</h2>
-                <p className="mt-2 text-sm text-gray-500">Nowe zamówienia pojawią się tutaj po złożeniu przez klienta.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-500">Liczba zamówień: {orders.length}</p>
-                {orders.map((order) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    onStatusChange={handleStatusChange}
-                    saving={savingOrderId === order.id}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">Liczba zamówień: {orders.length}</p>
+            {orders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onStatusChange={handleStatusChange}
+                saving={savingOrderId === order.id}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

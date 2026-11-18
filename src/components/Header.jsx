@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Flower2, Sparkles, UserCheck } from 'lucide-react';
+import { ShoppingBag, Flower2, Sparkles, UserCheck, UserRound, ShieldCheck } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const Header = () => {
   const cart = useCartStore((state) => state.cart);
   const addedEvent = useCartStore((state) => state.addedEvent);
+  const user = useAuthStore((state) => state.user);
   
   const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0) + (addedEvent ? 1 : 0);
 
@@ -29,14 +31,35 @@ export const Header = () => {
           </Link>
         </nav>
 
-        <Link to="/checkout" className="relative p-2 bg-rose-50 rounded-full text-rose-600 hover:bg-rose-100 transition">
-          <ShoppingBag size={22} />
-          {totalCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-              {totalCount}
-            </span>
+        <div className="flex items-center gap-2">
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              aria-label="Panel administratora"
+              title="Panel administratora"
+              className="p-2 rounded-full text-rose-600 hover:bg-rose-50 transition"
+            >
+              <ShieldCheck size={21} />
+            </Link>
           )}
-        </Link>
+          <Link
+            to="/account"
+            aria-label={user ? `Konto: ${user.name}` : 'Konto'}
+            title={user?.email || 'Konto'}
+            className="flex items-center gap-2 rounded-full px-2.5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 transition"
+          >
+            <UserRound size={20} className="text-rose-500" />
+            <span className="hidden sm:inline">{user ? user.name.split(' ')[0] : 'Konto'}</span>
+          </Link>
+          <Link to="/checkout" className="relative p-2 bg-rose-50 rounded-full text-rose-600 hover:bg-rose-100 transition">
+            <ShoppingBag size={22} />
+            {totalCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                {totalCount}
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
     </header>
   );
