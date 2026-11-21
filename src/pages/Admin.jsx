@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, RefreshCw, ShieldCheck, Truck } from 'lucide-react';
+import { LogOut, RefreshCw, Search, ShieldCheck, Truck } from 'lucide-react';
+import { AdminProducts } from '../components/AdminProducts';
 import {
   fetchAdminOrders,
   isOrderApiEnabled,
@@ -134,6 +135,47 @@ export const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [savingOrderId, setSavingOrderId] = useState('');
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('orders');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState('all');
+
+  const periodOrders = useMemo(() => {
+    if (periodFilter === 'all') return orders;
+    const now = new Date();
+    const start = new Date(now);
+    if (periodFilter === 'today') {
+      start.setHours(0, 0, 0, 0);
+    } else {
+      start.setDate(start.getDate() - Number(periodFilter));
+    }
+    return orders.filter((order) => new Date(order.createdAt) >= start);
+  }, [orders, periodFilter]);
+
+  const visibleOrders = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase('pl-PL');
+    return periodOrders.filter((order) => {
+      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+      const matchesSearch = !normalizedQuery || [
+        order.id,
+        order.customer.name,
+        order.customer.phone,
+        order.customer.email,
+      ].some((value) => value?.toLocaleLowerCase('pl-PL').includes(normalizedQuery));
+      return matchesStatus && matchesSearch;
+    });
+  }, [periodOrders, searchQuery, statusFilter]);
+
+  const orderSummary = useMemo(() => ({
+    total: periodOrders.length,
+    new: periodOrders.filter((order) => order.status === 'new').length,
+    inProgress: periodOrders.filter((order) =>
+      ['confirmed', 'preparing', 'out_for_delivery'].includes(order.status)
+    ).length,
+    completedTotal: periodOrders
+      .filter((order) => order.status === 'completed')
+      .reduce((sum, order) => sum + order.totals.total, 0),
+  }), [periodOrders]);
 
   const loadOrders = useCallback(async (activeToken) => {
     if (!activeToken) return;
@@ -207,21 +249,23 @@ export const Admin = () => {
               <ShieldCheck size={17} />
               Strefa administracyjna
             </p>
-            <h1 className="text-3xl font-bold text-gray-900">Zamówienia</h1>
-            <p className="mt-2 text-gray-500">Zalogowano jako {user.email}. Przeglądaj zamówienia i aktualizuj ich status.</p>
+            <h1 className="text-3xl font-bold text-gray-900">Panel administratora</h1>
+            <p className="mt-2 text-gray-500">Zalogowano jako {user.email}. Zarządzaj katalogiem i zamówieniami.</p>
           </div>
 
           {token && (
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => loadOrders(token)}
-                disabled={loading}
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-              >
-                <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                Odśwież
-              </button>
+              {activeTab === 'orders' && (
+                <button
+                  type="button"
+                  onClick={() => loadOrders(token)}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                  Odśwież
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleLogout}
@@ -234,26 +278,90 @@ export const Admin = () => {
           )}
         </div>
 
-        {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-        {loading && orders.length === 0 ? (
-          <div className="rounded-2xl bg-white p-8 text-center text-gray-500">Ładowanie zamówień…</div>
-        ) : orders.length === 0 ? (
-          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center">
-            <h2 className="text-lg font-bold text-gray-800">Nie ma jeszcze zamówień</h2>
-            <p className="mt-2 text-sm text-gray-500">Nowe zamówienia pojawią się tutaj po złożeniu przez klienta.</p>
-          </div>
+        <div className="mb-6 flex gap-2 border-b border-gray-200">
+          <button type="button" onClick={() => setActiveTab('orders')} className={`border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'orders' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+            Zamówienia
+          </button>
+          <button type="button" onClick={() => setActiveTab('products')} className={`border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'products' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+            Produkty
+          </button>
+        </div>
+
+        {activeTab === 'products' ? (
+          <AdminProducts token={token} />
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm text-gray-500">Liczba zamówień: {orders.length}</p>
-            {orders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onStatusChange={handleStatusChange}
-                saving={savingOrderId === order.id}
-              />
-            ))}
-          </div>
+          <>
+            {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+            <section className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: 'Zamówienia w okresie', value: orderSummary.total },
+                { label: 'Nowe', value: orderSummary.new },
+                { label: 'W realizacji', value: orderSummary.inProgress },
+                { label: 'Dostarczone (suma)', value: `${orderSummary.completedTotal} zł` },
+              ].map((card) => (
+                <article key={card.label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <p className="text-sm text-gray-500">{card.label}</p>
+                  <p className="mt-2 text-2xl font-bold text-gray-900">{card.value}</p>
+                </article>
+              ))}
+            </section>
+
+            <section className="mb-5 grid gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:grid-cols-[minmax(220px,1fr)_190px_190px]">
+              <label className="relative block">
+                <span className="sr-only">Szukaj po numerze zamówienia, kliencie lub telefonie</span>
+                <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Szukaj zamówienia lub klienta"
+                  className={`${inputClass} pl-10`}
+                />
+              </label>
+              <label>
+                <span className="sr-only">Okres zamówień</span>
+                <select value={periodFilter} onChange={(event) => setPeriodFilter(event.target.value)} className={inputClass}>
+                  <option value="all">Cały okres</option>
+                  <option value="today">Dzisiaj</option>
+                  <option value="7">Ostatnie 7 dni</option>
+                  <option value="30">Ostatnie 30 dni</option>
+                </select>
+              </label>
+              <label>
+                <span className="sr-only">Filtr statusu</span>
+                <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClass}>
+                  <option value="all">Wszystkie statusy</option>
+                  {statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
+                </select>
+              </label>
+            </section>
+
+            {loading && orders.length === 0 ? (
+              <div className="rounded-2xl bg-white p-8 text-center text-gray-500">Ładowanie zamówień…</div>
+            ) : orders.length === 0 ? (
+              <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center">
+                <h2 className="text-lg font-bold text-gray-800">Nie ma jeszcze zamówień</h2>
+                <p className="mt-2 text-sm text-gray-500">Nowe zamówienia pojawią się tutaj po złożeniu przez klienta.</p>
+              </div>
+            ) : visibleOrders.length === 0 ? (
+              <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center">
+                <h2 className="text-lg font-bold text-gray-800">Nie znaleziono zamówień</h2>
+                <p className="mt-2 text-sm text-gray-500">Zmień wyszukiwaną frazę, okres lub status.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">Wyświetlone zamówienia: {visibleOrders.length} z {periodOrders.length}</p>
+                {visibleOrders.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    onStatusChange={handleStatusChange}
+                    saving={savingOrderId === order.id}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2, ShoppingBag, Truck } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { checkoutSchema, todayISO } from '../lib/checkoutSchema';
 import { calcTotals } from '../lib/pricing';
+import { resolveProductImage } from '../lib/productImage';
 import { isOrderApiEnabled, submitOrder } from '../lib/orderApi';
 import { useAuthStore } from '../store/useAuthStore';
 import delivery from '../data/delivery.json';
@@ -27,7 +28,7 @@ const CartItemRow = ({ item }) => {
 
   return (
     <div className="flex items-center gap-4 py-3">
-      <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover" />
+      <img src={resolveProductImage(item.image)} alt={item.name} className="w-16 h-16 rounded-xl object-cover" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-gray-800 truncate">{item.name}</div>
         <div className="text-sm text-gray-500">{item.price} zł</div>
@@ -49,7 +50,8 @@ const CartItemRow = ({ item }) => {
           type="button"
           onClick={() => updateQuantity(item.id, 1)}
           aria-label="Zwiększ liczbę sztuk"
-          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+          disabled={Number.isInteger(item.stock) && item.quantity >= item.stock}
+          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus size={14} />
         </button>
@@ -74,6 +76,7 @@ export const Checkout = () => {
   const removeEvent = useCartStore((s) => s.removeEvent);
   const placeOrder = useCartStore((s) => s.placeOrder);
   const accountUser = useAuthStore((s) => s.user);
+  const accountToken = useAuthStore((s) => s.token);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -121,7 +124,7 @@ export const Checkout = () => {
 
     try {
       const savedOrder = isOrderApiEnabled
-        ? await submitOrder(orderDetails)
+        ? await submitOrder(orderDetails, accountToken)
         : orderDetails;
       const orderId = placeOrder(savedOrder);
       navigate(`/order/${orderId}`);
@@ -148,6 +151,15 @@ export const Checkout = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Dane do zamówienia</h1>
+      {!accountUser && isOrderApiEnabled && (
+        <p className="mb-6 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          Chcesz zobaczyć zamówienie w historii konta?{' '}
+          <Link to="/account" state={{ from: { pathname: '/checkout' } }} className="font-semibold underline">
+            Zaloguj się przed zakupem
+          </Link>
+          .
+        </p>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8 items-start">
         {/* Левая колонка: товары + форма */}

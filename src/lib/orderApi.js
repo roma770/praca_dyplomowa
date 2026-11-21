@@ -18,12 +18,18 @@ const request = async (path, { token, ...options } = {}) => {
   return body;
 };
 
-export const submitOrder = async (order) => {
+export const submitOrder = async (order, token) => {
   const { order: savedOrder } = await request('/orders', {
     method: 'POST',
+    token,
     body: JSON.stringify(order),
   });
   return savedOrder;
+};
+
+export const fetchProducts = async () => {
+  const { products } = await request('/products');
+  return products;
 };
 
 export const registerAccount = (profile) =>
@@ -42,6 +48,34 @@ export const logoutAccount = (token) => request('/auth/logout', { method: 'POST'
 export const fetchAdminOrders = async (token) => {
   const { orders } = await request('/admin/orders', { token });
   return orders;
+};
+
+export const fetchMyOrders = async (token) => {
+  const { orders } = await request('/account/orders', { token });
+  return orders;
+};
+
+export const fetchAdminProducts = async (token) => {
+  const { products } = await request('/admin/products', { token });
+  return products;
+};
+
+export const createProduct = async (token, product) => {
+  const { product: savedProduct } = await request('/admin/products', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(product),
+  });
+  return savedProduct;
+};
+
+export const updateProduct = async (token, productId, product) => {
+  const { product: savedProduct } = await request(`/admin/products/${encodeURIComponent(productId)}`, {
+    method: 'PATCH',
+    token,
+    body: JSON.stringify(product),
+  });
+  return savedProduct;
 };
 
 export const updateOrderStatus = async (token, orderId, status) => {

@@ -3,32 +3,261 @@
     "id": "b1",
     "name": "Różowa delikatność",
     "category": "bouquets",
-    "price": 1200,
+    "price": 179,
+    "stock": 8,
     "image": "https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=600&q=80",
     "description": "Klasyczny bukiet z różowych róż i piwonii, który pięknie podkreśli wyjątkową chwilę."
   },
   {
+    "id": "b2",
+    "name": "Pastelowe tulipany",
+    "category": "bouquets",
+    "price": 129,
+    "stock": 12,
+    "image": "https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=600&q=80",
+    "description": "Bukiet świeżych tulipanów w delikatnych, wiosennych kolorach."
+  },
+  {
+    "id": "b3",
+    "name": "Słoneczny bukiet",
+    "category": "bouquets",
+    "price": 169,
+    "stock": 7,
+    "image": "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=600&q=80",
+    "description": "Radosna kompozycja ze słoneczników i sezonowych dodatków."
+  },
+  {
+    "id": "b4",
+    "name": "Białe róże i eukaliptus",
+    "category": "bouquets",
+    "price": 219,
+    "stock": 6,
+    "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=600&q=80",
+    "description": "Eleganckie białe róże z zielonym eukaliptusem, odpowiednie na ważną uroczystość."
+  },
+  {
+    "id": "b5",
+    "name": "Pudrowe piwonie",
+    "category": "bouquets",
+    "price": 249,
+    "stock": 4,
+    "image": "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=600&q=80",
+    "description": "Pełna, romantyczna kompozycja w odcieniach pudrowego różu."
+  },
+  {
+    "id": "b6",
+    "name": "Bukiet sezonowy",
+    "category": "bouquets",
+    "price": 139,
+    "stock": 10,
+    "image": "https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&fit=crop&w=600&q=80",
+    "description": "Kolorowy bukiet z kwiatów dostępnych w danym sezonie."
+  },
+  {
+    "id": "b7",
+    "name": "Różowo-białe róże",
+    "category": "bouquets",
+    "price": 189,
+    "stock": 6,
+    "image": "https://images.unsplash.com/photo-1456415333674-42b11b9f5b7b?auto=format&fit=crop&w=600&q=80",
+    "description": "Romantyczny bukiet różowych i białych róż, który rozjaśni wyjątkowy dzień."
+  },
+  {
+    "id": "b8",
+    "name": "Kolorowe tulipany",
+    "category": "bouquets",
+    "price": 159,
+    "stock": 9,
+    "image": "https://images.unsplash.com/photo-1680360383476-9ada16f64abb?auto=format&fit=crop&w=600&q=80",
+    "description": "Wesoła mieszanka tulipanów w różowych, żółtych i fioletowych odcieniach."
+  },
+  {
+    "id": "b9",
+    "name": "Czerwone róże z bilecikiem",
+    "category": "bouquets",
+    "price": 229,
+    "stock": 5,
+    "image": "https://images.unsplash.com/photo-1683844234556-bc37ff33efc1?auto=format&fit=crop&w=600&q=80",
+    "description": "Klasyczne czerwone róże w eleganckim papierze — prezent na ważne wyznanie."
+  },
+  {
+    "id": "b10",
+    "name": "Flower box „Pudrowy róż”",
+    "category": "bouquets",
+    "price": 239,
+    "stock": 4,
+    "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=600&q=80",
+    "description": "Kwiaty ułożone w ozdobnym pudełku, gotowe do wręczenia bez wazonu."
+  },
+  {
     "id": "m1",
-    "name": "Męski bukiet z przysmakami",
+    "name": "Bukiet z kabanosami i serem",
     "category": "mens",
-    "price": 2100,
-    "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
-    "description": "Wyrazisty zestaw z kiełbasą, serem cheddar, pieczywem i chrupiącymi dodatkami."
+    "price": 239,
+    "stock": 5,
+    "image": "images/catalog/meat-bouquet-classic.jpg",
+    "description": "Wyrazisty bukiet z dojrzewającą kiełbasą, serem, pomidorkami i świeżymi ziołami."
+  },
+  {
+    "id": "m2",
+    "name": "Rustykalny bukiet mięsny",
+    "category": "mens",
+    "price": 259,
+    "stock": 4,
+    "image": "images/catalog/meat-bouquet-kraft.jpg",
+    "description": "Kraftowa oprawa, kabanosy, paluszki serowe i pomidorki koktajlowe — prezent z charakterem."
+  },
+  {
+    "id": "m3",
+    "name": "Bukiet degustacyjny „Grillmaster”",
+    "category": "mens",
+    "price": 289,
+    "stock": 6,
+    "image": "images/catalog/meat-bouquet-classic.jpg",
+    "description": "Syta kompozycja z kilku rodzajów kiełbasy, sera i pikantnych dodatków."
+  },
+  {
+    "id": "m4",
+    "name": "Bukiet serowo-mięsny premium",
+    "category": "mens",
+    "price": 319,
+    "stock": 3,
+    "image": "images/catalog/meat-bouquet-kraft.jpg",
+    "description": "Bogatsza wersja z dojrzewającymi wędlinami, kilkoma serami i dekoracyjnymi ziołami."
+  },
+  {
+    "id": "m5",
+    "name": "Bukiet „Pikantny smak”",
+    "category": "mens",
+    "price": 249,
+    "stock": 4,
+    "image": "images/catalog/meat-bouquet-classic.jpg",
+    "description": "Kabanosy, pikantne salami, ser i kolorowe dodatki dla miłośnika wyrazistych smaków."
+  },
+  {
+    "id": "m6",
+    "name": "Duży bukiet dla smakosza",
+    "category": "mens",
+    "price": 349,
+    "stock": 2,
+    "image": "images/catalog/meat-bouquet-kraft.jpg",
+    "description": "Okazały bukiet na jubileusz lub ważne urodziny, złożony z wędlin, serów i chrupiących dodatków."
+  },
+  {
+    "id": "m7",
+    "name": "Mini bukiet z przysmakami",
+    "category": "mens",
+    "price": 169,
+    "stock": 7,
+    "image": "images/catalog/meat-bouquet-classic.jpg",
+    "description": "Mniejsza, apetyczna wersja bukietu — miły prezent na każdą okazję."
   },
   {
     "id": "ball1",
     "name": "Balony „Romantyczny zestaw”",
     "category": "balloons",
-    "price": 650,
+    "price": 119,
+    "stock": 9,
     "image": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80",
-    "description": "Dziesięć balonów w kształcie serc — gotowy pomysł na romantyczną niespodziankę."
+    "description": "Zestaw balonów w kształcie serc — gotowy pomysł na romantyczną niespodziankę."
+  },
+  {
+    "id": "ball2",
+    "name": "Bukiet balonów pastelowych",
+    "category": "balloons",
+    "price": 99,
+    "stock": 8,
+    "image": "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=600&q=80",
+    "description": "Pastelowe balony na urodziny, rocznicę lub małe świętowanie."
+  },
+  {
+    "id": "ball3",
+    "name": "Zestaw balonów urodzinowych",
+    "category": "balloons",
+    "price": 149,
+    "stock": 7,
+    "image": "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80",
+    "description": "Kolorowa dekoracja z balonami na przyjęcie urodzinowe."
+  },
+  {
+    "id": "ball4",
+    "name": "Balonowy prezent „Witaj, maluszku”",
+    "category": "balloons",
+    "price": 169,
+    "stock": 5,
+    "image": "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&q=80",
+    "description": "Delikatny zestaw balonów na baby shower lub powitanie nowego członka rodziny."
+  },
+  {
+    "id": "ball5",
+    "name": "Balon foliowy „Czerwone serce”",
+    "category": "balloons",
+    "price": 59,
+    "stock": 10,
+    "image": "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=600&q=80",
+    "description": "Duże czerwone serce z helem — drobny, romantyczny dodatek do kwiatów."
+  },
+  {
+    "id": "ball6",
+    "name": "Bukiet balonów „Złoty wieczór”",
+    "category": "balloons",
+    "price": 179,
+    "stock": 5,
+    "image": "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80",
+    "description": "Efektowny bukiet balonów w złotych i kremowych odcieniach na urodziny lub rocznicę."
   },
   {
     "id": "s1",
     "name": "Świeca sojowa o zapachu lawendy",
     "category": "souvenirs",
-    "price": 350,
+    "price": 49,
+    "stock": 14,
     "image": "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=600&q=80",
     "description": "Ręcznie wykonana świeca z wosku sojowego, która wypełni wnętrze spokojnym zapachem lawendy."
+  },
+  {
+    "id": "s2",
+    "name": "Pudełko pralin",
+    "category": "souvenirs",
+    "price": 39,
+    "stock": 16,
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80",
+    "description": "Mały słodki upominek, który dobrze uzupełni bukiet kwiatów."
+  },
+  {
+    "id": "s3",
+    "name": "Pudełko prezentowe z herbatą",
+    "category": "souvenirs",
+    "price": 69,
+    "stock": 10,
+    "image": "https://images.unsplash.com/photo-1513204899-1e0d6b90b46?auto=format&fit=crop&w=600&q=80",
+    "description": "Aromatyczna herbata i drobne słodkości w pudełku gotowym do wręczenia."
+  },
+  {
+    "id": "s4",
+    "name": "Zestaw prezentowy „Chwila relaksu”",
+    "category": "souvenirs",
+    "price": 89,
+    "stock": 7,
+    "image": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80",
+    "description": "Niewielki zestaw upominkowy z dodatkami do spokojnego wieczoru."
+  },
+  {
+    "id": "s5",
+    "name": "Pudełko „Słodka chwila”",
+    "category": "souvenirs",
+    "price": 59,
+    "stock": 9,
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80",
+    "description": "Czekoladki i małe słodkości w ozdobnym pudełku, które uzupełnią bukiet."
+  },
+  {
+    "id": "s6",
+    "name": "Kartka z życzeniami",
+    "category": "souvenirs",
+    "price": 19,
+    "stock": 20,
+    "image": "https://images.unsplash.com/photo-1513204899-1e0d6b90b46?auto=format&fit=crop&w=600&q=80",
+    "description": "Elegancka kartka na osobiste życzenia, dołączana do kwiatów lub prezentu."
   }
 ]

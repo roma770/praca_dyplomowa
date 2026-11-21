@@ -1,10 +1,10 @@
 {
-  "freeDeliveryFrom": 2000,
+  "freeDeliveryFrom": 250,
   "currency": "zł",
   "zones": [
-    { "id": "center", "name": "Centrum miasta", "price": 80 },
-    { "id": "suburbs", "name": "Dzielnice poza centrum", "price": 120 },
-    { "id": "outskirts", "name": "Okolice miasta (do 15 km)", "price": 200 }
+    { "id": "center", "name": "Centrum miasta", "price": 25 },
+    { "id": "suburbs", "name": "Dzielnice poza centrum", "price": 35 },
+    { "id": "outskirts", "name": "Okolice miasta (do 15 km)", "price": 50 }
   ],
   "slots": ["09:00–12:00", "12:00–15:00", "15:00–18:00", "18:00–21:00"]
 }

@@ -39,7 +39,7 @@ const buildInstances = (selected) => {
 };
 
 // ---------- Бутоны разных видов ----------
-const Head = ({ kind, color }) => {
+const Head = ({ kind, color, accent }) => {
   switch (kind) {
     case 'rose':
       return (
@@ -96,6 +96,62 @@ const Head = ({ kind, color }) => {
           <mesh geometry={sphereGeo} scale={0.07} position={[0, 0.15, 0]}>
             <meshStandardMaterial color="#f7d36b" roughness={0.7} />
           </mesh>
+        </group>
+      );
+
+    case 'daisy':
+    case 'gerbera':
+    case 'sunflower':
+    case 'carnation': {
+      const petalCount = kind === 'sunflower' ? 14 : kind === 'gerbera' ? 12 : 9;
+      return (
+        <group>
+          {Array.from({ length: petalCount }, (_, i) => {
+            const angle = (i / petalCount) * Math.PI * 2;
+            return (
+              <mesh
+                key={i}
+                geometry={sphereGeo}
+                scale={kind === 'sunflower' ? [0.055, 0.04, 0.16] : [0.065, 0.045, 0.14]}
+                position={[Math.cos(angle) * 0.12, 0, Math.sin(angle) * 0.12]}
+                rotation={[0, -angle, 0]}
+              >
+                <meshStandardMaterial color={color} roughness={0.6} />
+              </mesh>
+            );
+          })}
+          <mesh geometry={sphereGeo} scale={kind === 'sunflower' ? 0.12 : 0.085}>
+            <meshStandardMaterial color={accent || shade(color, 0.72)} roughness={0.72} />
+          </mesh>
+        </group>
+      );
+    }
+
+    case 'gypsophila':
+      return (
+        <group>
+          {Array.from({ length: 8 }, (_, i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            return (
+              <mesh key={i} geometry={sphereGeo} scale={0.045} position={[Math.cos(angle) * 0.1, (i % 2) * 0.06, Math.sin(angle) * 0.1]}>
+                <meshStandardMaterial color={color} roughness={0.78} />
+              </mesh>
+            );
+          })}
+          <mesh geometry={sphereGeo} scale={0.045}>
+            <meshStandardMaterial color={color} roughness={0.78} />
+          </mesh>
+        </group>
+      );
+
+    case 'lavender':
+      return (
+        <group>
+          {Array.from({ length: 7 }, (_, i) => (
+            <mesh key={i} geometry={sphereGeo} scale={[0.045, 0.065, 0.045]} position={[Math.sin(i * 1.4) * 0.06, i * 0.09, Math.cos(i * 1.4) * 0.06]}>
+              <meshStandardMaterial color={color} roughness={0.75} />
+            </mesh>
+          ))}
         </group>
       );
 
@@ -162,7 +218,7 @@ const Flower = ({ flower, target }) => {
       </mesh>
       <group ref={head}>
         <group scale={1.3}>
-          <Head kind={flower.kind} color={flower.color} />
+          <Head kind={flower.kind} color={flower.color} accent={flower.accent} />
         </group>
       </group>
     </group>

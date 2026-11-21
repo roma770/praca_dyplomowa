@@ -1,10 +1,10 @@
 import React from 'react';
 import { ProductCard } from '../components/ProductCard';
-import productsData from '../data/products.json';
+import { useStoreProducts } from '../hooks/useStoreProducts';
 
 export const Home = () => {
-  // Исключаем мужские букеты для главной страницы
-  const standardProducts = productsData.filter(p => p.category !== 'mens');
+  const { products, error } = useStoreProducts();
+  const standardProducts = products.filter((product) => product.category !== 'mens');
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -32,12 +32,15 @@ export const Home = () => {
 
       {/* Каталог */}
       <h2 className="text-3xl font-bold text-gray-800 mb-8">Wybierz coś pięknego</h2>
+
+      {error && <p role="status" className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}</p>}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {standardProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+      {standardProducts.length === 0 && <p className="text-gray-500">Wkrótce dodamy nowe produkty.</p>}
     </div>
   );
 };
