@@ -30,7 +30,7 @@ Zalogowany klient może zobaczyć historię zamówień na stronie konta. Zamówi
 
 ## Asortyment
 
-Początkowy katalog zawiera 29 produktów: bukiety kwiatowe, balony, upominki oraz 7 jadalnych bukietów dla niego. Kreator własnego bukietu udostępnia 13 rodzajów kwiatów i 11 wariantów opakowania. Zdjęcia dwóch bukietów mięsnych pochodzą z materiałów przekazanych do projektu.
+Początkowy katalog zawiera 29 produktów: bukiety kwiatowe, balony, upominki oraz 7 jadalnych bukietów dla niego. Osobny dział **Bukiety dla niej** prezentuje kompozycje kwiatowe z katalogu. Kreator własnego bukietu udostępnia 13 rodzajów kwiatów i 11 wariantów opakowania. Zdjęcia dwóch bukietów mięsnych pochodzą z materiałów przekazanych do projektu.
 
 Katalog obsługuje wyszukiwanie, filtrowanie po kategorii i maksymalnej cenie oraz sortowanie. Karta produktu zawiera opis, stan magazynowy i opinie klientów. Lista ulubionych jest zapisywana w przeglądarce. Przy zamówieniu można wybrać termin dostawy i styl bileciku.
 

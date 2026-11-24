@@ -14,6 +14,7 @@ import { ProductDetails } from './pages/ProductDetails';
 import { Favorites } from './pages/Favorites';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { ForHer } from './pages/ForHer';
 import { isOrderApiEnabled } from './lib/orderApi';
 import { useAuthStore } from './store/useAuthStore';
 
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/builder" element={<Builder />} />
             <Route path="/mens" element={<MensSection />} />
+            <Route path="/for-her" element={<ForHer />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderSuccess />} />
             <Route path="/account" element={<Account />} />

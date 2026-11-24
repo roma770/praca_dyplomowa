@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, Heart, ShoppingCart, Star } from 'lucide-react';
 import { useStoreProducts } from '../hooks/useStoreProducts';
 import { useCartStore } from '../store/useCartStore';
@@ -11,6 +11,7 @@ const dateLabel = (value) => new Intl.DateTimeFormat('pl-PL', { dateStyle: 'medi
 
 export const ProductDetails = () => {
   const { id } = useParams();
+  const location = useLocation();
   const { products, loading } = useStoreProducts();
   const product = products.find((item) => item.id === id);
   const addToCart = useCartStore((state) => state.addToCart);
@@ -26,6 +27,7 @@ export const ProductDetails = () => {
   const [reviewForm, setReviewForm] = useState({ name: '', email: '', comment: '' });
   const isFavorite = favoriteIds.includes(id);
   const quantityLimitReached = Number.isInteger(product?.stock) && cartQuantity >= product.stock;
+  const returnTo = location.state?.from || (product?.category === 'mens' ? '/mens' : product?.category === 'bouquets' ? '/for-her' : '/');
 
   useEffect(() => {
     let active = true;
@@ -74,7 +76,7 @@ export const ProductDetails = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-      <Link to={product.category === 'mens' ? '/mens' : '/'} className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-rose-600"><ArrowLeft size={17} /> Wróć do oferty</Link>
+      <Link to={returnTo} className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-rose-600"><ArrowLeft size={17} /> Wróć do oferty</Link>
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div className="relative overflow-hidden rounded-3xl bg-white shadow-sm">
           <img src={resolveProductImage(product.image)} alt={product.name} className="h-full min-h-[320px] max-h-[650px] w-full object-cover" />

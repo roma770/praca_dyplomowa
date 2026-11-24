@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { resolveProductImage } from '../lib/productImage';
 import { useFavoritesStore } from '../store/useFavoritesStore';
 
 export const ProductCard = ({ product }) => {
+  const location = useLocation();
   const addToCart = useCartStore((state) => state.addToCart);
   const favoriteIds = useFavoritesStore((state) => state.favoriteIds);
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
@@ -16,11 +17,13 @@ export const ProductCard = ({ product }) => {
   const stockIsTracked = Number.isInteger(product.stock);
   const isOutOfStock = stockIsTracked && product.stock === 0;
   const quantityLimitReached = stockIsTracked && inCart >= product.stock;
+  const productHref = `/product/${encodeURIComponent(product.id)}`;
+  const productState = { from: `${location.pathname}${location.search}` };
 
   return (
     <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
       <div className="relative h-64 overflow-hidden">
-        <Link to={`/product/${encodeURIComponent(product.id)}`} aria-label={`Zobacz produkt: ${product.name}`} className="block h-full">
+        <Link to={productHref} state={productState} aria-label={`Zobacz produkt: ${product.name}`} className="block h-full">
           <img
             src={resolveProductImage(product.image)}
             alt={product.name}
@@ -47,7 +50,7 @@ export const ProductCard = ({ product }) => {
       </div>
       
       <div className="p-5 flex flex-col flex-grow">
-        <Link to={`/product/${encodeURIComponent(product.id)}`} className="mb-2 text-lg font-bold text-gray-800 hover:text-rose-600">{product.name}</Link>
+        <Link to={productHref} state={productState} className="mb-2 text-lg font-bold text-gray-800 hover:text-rose-600">{product.name}</Link>
         <p className="text-gray-500 text-sm mb-4 flex-grow">{product.description}</p>
         <Link to={`/product/${encodeURIComponent(product.id)}`} className="mb-4 text-xs font-semibold text-rose-600 hover:underline">Szczegóły i opinie</Link>
         
