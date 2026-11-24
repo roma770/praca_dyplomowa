@@ -10,6 +10,10 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { Admin } from './pages/Admin';
 import { Account } from './pages/Account';
+import { ProductDetails } from './pages/ProductDetails';
+import { Favorites } from './pages/Favorites';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
 import { isOrderApiEnabled } from './lib/orderApi';
 import { useAuthStore } from './store/useAuthStore';
 
@@ -33,6 +37,10 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/builder" element={<Builder />} />
             <Route path="/mens" element={<MensSection />} />
             <Route path="/checkout" element={<Checkout />} />

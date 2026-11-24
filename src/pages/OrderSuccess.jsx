@@ -64,6 +64,7 @@ export const OrderSuccess = () => {
             <br />
             Odbiorca: {delivery.recipientName}
           </p>
+          {delivery.cardDesignName && delivery.cardDesign !== 'none' && <p className="mt-2 text-sm text-gray-500">Bilecik: {delivery.cardDesignName}</p>}
           {delivery.cardText && (
             <p className="text-sm text-gray-500 italic mt-2">Wiadomość na bileciku: „{delivery.cardText}”</p>
           )}

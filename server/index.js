@@ -87,6 +87,27 @@ database.exec(`
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS product_reviews (
+    id TEXT PRIMARY KEY,
+    product_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  );
+  CREATE TABLE IF NOT EXISTS contact_messages (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    is_read INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS idx_reviews_product_created ON product_reviews(product_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_contact_created ON contact_messages(created_at DESC);
 `);
 
 const tableColumns = (tableName) =>
@@ -326,6 +347,23 @@ const asOrder = (row) => ({
 
 const selectOrders = database.prepare('SELECT * FROM orders ORDER BY created_at DESC');
 const selectOrder = database.prepare('SELECT * FROM orders WHERE id = ?');
+const asReview = (row) => ({
+  id: row.id,
+  productId: row.product_id,
+  name: row.name,
+  rating: row.rating,
+  comment: row.comment,
+  createdAt: row.created_at,
+});
+const asContactMessage = (row) => ({
+  id: row.id,
+  name: row.name,
+  email: row.email,
+  subject: row.subject,
+  message: row.message,
+  createdAt: row.created_at,
+  isRead: Boolean(row.is_read),
+});
 
 const normalizeItem = (item) => {
   if (!item || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 50) {
@@ -506,12 +544,18 @@ const createOrder = (payload, userId = null) => {
   }
 
   const date = validateText(payload.delivery?.date, 'Delivery date', 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  const parsedDate = new Date(`${date}T00:00:00Z`);
+  const todayInWarsaw = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Warsaw' }).format(new Date());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== date || date < todayInWarsaw) {
     throw Object.assign(new Error('Delivery date is invalid.'), { statusCode: 400 });
   }
   const slot = validateText(payload.delivery?.slot, 'Delivery time', 32);
   if (!deliveryData.slots.includes(slot)) {
     throw Object.assign(new Error('Choose a valid delivery time.'), { statusCode: 400 });
+  }
+  const cardDesign = deliveryData.cardDesigns.find((entry) => entry.id === payload.delivery?.cardDesign);
+  if (!cardDesign) {
+    throw Object.assign(new Error('Choose a valid card design.'), { statusCode: 400 });
   }
 
   if (!Array.isArray(payload.items) || payload.items.length === 0 || payload.items.length > 30) {
@@ -544,6 +588,8 @@ const createOrder = (payload, userId = null) => {
     zoneName: zone.name,
     date,
     slot,
+    cardDesign: cardDesign.id,
+    cardDesignName: cardDesign.name,
     cardText: validateText(payload.delivery?.cardText, 'Card message', 200, false),
   };
 
@@ -671,6 +717,80 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    const reviewsRoute = path.match(/^\/api\/products\/([^/]+)\/reviews$/);
+    if (reviewsRoute && request.method === 'GET') {
+      const productId = decodeURIComponent(reviewsRoute[1]);
+      if (!selectProduct.get(productId)) {
+        sendJson(response, 404, { error: 'Product not found.' });
+        return;
+      }
+      const reviews = database.prepare(
+        'SELECT * FROM product_reviews WHERE product_id = ? ORDER BY created_at DESC'
+      ).all(productId).map(asReview);
+      sendJson(response, 200, { reviews });
+      return;
+    }
+
+    if (reviewsRoute && request.method === 'POST') {
+      const productId = decodeURIComponent(reviewsRoute[1]);
+      const product = selectProduct.get(productId);
+      if (!product || !product.is_active) {
+        sendJson(response, 404, { error: 'Product not found.' });
+        return;
+      }
+      const payload = await readRequestJson(request);
+      const name = validateText(payload.name, 'Name', 80);
+      const email = payload.email ? normalizeEmail(payload.email) : null;
+      const rating = Number(payload.rating);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+        throw Object.assign(new Error('Choose a rating from 1 to 5.'), { statusCode: 400 });
+      }
+      const comment = validateText(payload.comment, 'Review', 500);
+      if (comment.length < 5) {
+        throw Object.assign(new Error('Review must contain at least 5 characters.'), { statusCode: 400 });
+      }
+      const review = {
+        id: `REV-${randomBytes(8).toString('hex').toUpperCase()}`,
+        productId,
+        name,
+        rating,
+        comment,
+        createdAt: new Date().toISOString(),
+      };
+      database.prepare(
+        `INSERT INTO product_reviews (id, product_id, name, email, rating, comment, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      ).run(review.id, productId, name, email, rating, comment, review.createdAt);
+      sendJson(response, 201, { review });
+      return;
+    }
+
+    if (request.method === 'POST' && path === '/api/contact') {
+      const payload = await readRequestJson(request);
+      const name = validateText(payload.name, 'Name', 100);
+      const email = normalizeEmail(payload.email);
+      const subject = validateText(payload.subject, 'Subject', 120);
+      const message = validateText(payload.message, 'Message', 2000);
+      if (message.length < 10) {
+        throw Object.assign(new Error('Message must contain at least 10 characters.'), { statusCode: 400 });
+      }
+      const saved = {
+        id: `MSG-${randomBytes(8).toString('hex').toUpperCase()}`,
+        name,
+        email,
+        subject,
+        message,
+        createdAt: new Date().toISOString(),
+        isRead: false,
+      };
+      database.prepare(
+        `INSERT INTO contact_messages (id, name, email, subject, message, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      ).run(saved.id, name, email, subject, message, saved.createdAt);
+      sendJson(response, 201, { message: saved });
+      return;
+    }
+
     if (request.method === 'POST' && path === '/api/auth/register') {
       const payload = await readRequestJson(request);
       const name = validateText(payload.name, 'Name', 100);
@@ -795,6 +915,25 @@ const server = createServer(async (request, response) => {
 
       if (request.method === 'GET' && path === '/api/admin/products') {
         sendJson(response, 200, { products: selectProducts.all().map(asProduct) });
+        return;
+      }
+
+      if (request.method === 'GET' && path === '/api/admin/messages') {
+        const messages = database.prepare('SELECT * FROM contact_messages ORDER BY created_at DESC').all().map(asContactMessage);
+        sendJson(response, 200, { messages });
+        return;
+      }
+
+      const contactMessageRoute = path.match(/^\/api\/admin\/messages\/([^/]+)\/read$/);
+      if (request.method === 'PATCH' && contactMessageRoute) {
+        const messageId = decodeURIComponent(contactMessageRoute[1]);
+        const row = database.prepare('SELECT id FROM contact_messages WHERE id = ?').get(messageId);
+        if (!row) {
+          sendJson(response, 404, { error: 'Message not found.' });
+          return;
+        }
+        database.prepare('UPDATE contact_messages SET is_read = 1 WHERE id = ?').run(messageId);
+        sendJson(response, 200, { ok: true });
         return;
       }
 

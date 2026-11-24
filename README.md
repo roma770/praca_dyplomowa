@@ -32,6 +32,10 @@ Zalogowany klient może zobaczyć historię zamówień na stronie konta. Zamówi
 
 Początkowy katalog zawiera 29 produktów: bukiety kwiatowe, balony, upominki oraz 7 jadalnych bukietów dla niego. Kreator własnego bukietu udostępnia 13 rodzajów kwiatów i 11 wariantów opakowania. Zdjęcia dwóch bukietów mięsnych pochodzą z materiałów przekazanych do projektu.
 
+Katalog obsługuje wyszukiwanie, filtrowanie po kategorii i maksymalnej cenie oraz sortowanie. Karta produktu zawiera opis, stan magazynowy i opinie klientów. Lista ulubionych jest zapisywana w przeglądarce. Przy zamówieniu można wybrać termin dostawy i styl bileciku.
+
+Strony **O nas** i **Kontakt** są dostępne z menu i stopki. Formularz kontaktowy zapisuje wiadomości w SQLite; administrator może je przeglądać w panelu. Podsumowanie administratora pokazuje sprzedaż, popularne produkty i niskie stany magazynowe.
+
 ## GitHub Pages
 
-GitHub Pages udostępnia statyczną wersję katalogu. Zarządzanie kontami, produktami i zamówieniami wymaga wdrożonego API z trwałą bazą danych. Po wdrożeniu API należy ustawić sekret repozytorium `VITE_API_URL` na jego publiczny adres i dodać adres strony do `BLOOM_CORS_ORIGINS` po stronie API.
+GitHub Pages udostępnia statyczną wersję katalogu. Konta, produkty administracyjne, zamówienia, opinie, kontakt i statystyki wymagają wdrożonego API z trwałą bazą danych. Po wdrożeniu API należy ustawić sekret repozytorium `VITE_API_URL` na jego publiczny adres i dodać adres strony do `BLOOM_CORS_ORIGINS` po stronie API. Ulubione produkty są zapisywane w przeglądarce.

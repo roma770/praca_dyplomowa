@@ -1,10 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
-import { ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { resolveProductImage } from '../lib/productImage';
+import { useFavoritesStore } from '../store/useFavoritesStore';
 
 export const ProductCard = ({ product }) => {
   const addToCart = useCartStore((state) => state.addToCart);
+  const favoriteIds = useFavoritesStore((state) => state.favoriteIds);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const isFavorite = favoriteIds.includes(product.id);
   const inCart = useCartStore((state) =>
     state.cart.find((item) => item.id === product.id)?.quantity || 0
   );
@@ -13,13 +18,24 @@ export const ProductCard = ({ product }) => {
   const quantityLimitReached = stockIsTracked && inCart >= product.stock;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
+    <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
       <div className="relative h-64 overflow-hidden">
-        <img 
-          src={resolveProductImage(product.image)}
-          alt={product.name} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        <Link to={`/product/${encodeURIComponent(product.id)}`} aria-label={`Zobacz produkt: ${product.name}`} className="block h-full">
+          <img
+            src={resolveProductImage(product.image)}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </Link>
+        <button
+          type="button"
+          onClick={() => toggleFavorite(product.id)}
+          aria-label={isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          aria-pressed={isFavorite}
+          className={`absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-sm transition hover:scale-105 ${isFavorite ? 'text-rose-500' : 'text-gray-500 hover:text-rose-500'}`}
+        >
+          <Heart size={19} fill={isFavorite ? 'currentColor' : 'none'} />
+        </button>
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-rose-600 shadow-sm">
           {product.price} zł
         </div>
@@ -31,8 +47,9 @@ export const ProductCard = ({ product }) => {
       </div>
       
       <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-gray-800 mb-2">{product.name}</h3>
+        <Link to={`/product/${encodeURIComponent(product.id)}`} className="mb-2 text-lg font-bold text-gray-800 hover:text-rose-600">{product.name}</Link>
         <p className="text-gray-500 text-sm mb-4 flex-grow">{product.description}</p>
+        <Link to={`/product/${encodeURIComponent(product.id)}`} className="mb-4 text-xs font-semibold text-rose-600 hover:underline">Szczegóły i opinie</Link>
         
         <button 
           type="button"
@@ -44,6 +61,6 @@ export const ProductCard = ({ product }) => {
           {isOutOfStock ? 'Brak w magazynie' : quantityLimitReached ? 'Dodano cały zapas' : 'Dodaj do koszyka'}
         </button>
       </div>
-    </div>
+    </article>
   );
 };

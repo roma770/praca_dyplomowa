@@ -6,5 +6,11 @@
     { "id": "suburbs", "name": "Dzielnice poza centrum", "price": 35 },
     { "id": "outskirts", "name": "Okolice miasta (do 15 km)", "price": 50 }
   ],
-  "slots": ["09:00–12:00", "12:00–15:00", "15:00–18:00", "18:00–21:00"]
+  "slots": ["09:00–12:00", "12:00–15:00", "15:00–18:00", "18:00–21:00"],
+  "cardDesigns": [
+    { "id": "none", "name": "Bez bileciku" },
+    { "id": "floral", "name": "Kwiatowy" },
+    { "id": "birthday", "name": "Urodzinowy" },
+    { "id": "minimal", "name": "Minimalistyczny" }
+  ]
 }

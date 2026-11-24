@@ -96,11 +96,14 @@ export const Checkout = () => {
       zone: '',
       date: '',
       slot: '',
+      cardDesign: 'floral',
       cardText: '',
     },
   });
 
   const zoneId = useWatch({ control, name: 'zone' });
+  const cardDesignId = useWatch({ control, name: 'cardDesign' });
+  const cardText = useWatch({ control, name: 'cardText' }) || '';
   const totals = calcTotals(cart, addedEvent, zoneId);
 
   const onSubmit = async (data) => {
@@ -115,7 +118,8 @@ export const Checkout = () => {
         zoneName: zone.name,
         date: data.date,
         slot: data.slot,
-        cardText: data.cardText,
+        cardDesign: data.cardDesign,
+        cardText: data.cardDesign === 'none' ? '' : data.cardText,
       },
       items: cart,
       event: addedEvent,
@@ -248,6 +252,13 @@ export const Checkout = () => {
                   </select>
                 </Field>
                 <div className="sm:col-span-2">
+                  <Field label="Styl bileciku" error={errors.cardDesign}>
+                    <select {...register('cardDesign')} className={inputClass}>
+                      {delivery.cardDesigns.map((design) => <option key={design.id} value={design.id}>{design.name}</option>)}
+                    </select>
+                  </Field>
+                </div>
+                {cardDesignId !== 'none' && <div className="sm:col-span-2">
                   <Field label="Wiadomość na bileciku (opcjonalnie)" error={errors.cardText}>
                     <textarea
                       {...register('cardText')}
@@ -255,8 +266,13 @@ export const Checkout = () => {
                       className={inputClass}
                       placeholder="Wszystkiego najlepszego! Niech każdy dzień przynosi Ci radość…"
                     />
+                    <span className="mt-1 block text-right text-xs text-gray-400">{cardText.length}/200</span>
                   </Field>
-                </div>
+                  <div className={`mt-3 rounded-xl border px-4 py-4 text-center ${cardDesignId === 'birthday' ? 'border-amber-200 bg-amber-50' : cardDesignId === 'minimal' ? 'border-gray-200 bg-gray-50' : 'border-rose-100 bg-rose-50'}`}>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-rose-500">{delivery.cardDesigns.find((design) => design.id === cardDesignId)?.name}</p>
+                    <p className="mt-2 font-serif text-gray-700">{cardText || 'Twoja wiadomość pojawi się tutaj'}</p>
+                  </div>
+                </div>}
               </div>
             </section>
           </form>

@@ -86,3 +86,51 @@ export const updateOrderStatus = async (token, orderId, status) => {
   });
   return order;
 };
+
+const reviewStorageKey = (productId) => `bloom-joy-reviews-${productId}`;
+
+export const fetchProductReviews = async (productId) => {
+  if (isOrderApiEnabled) {
+    const { reviews } = await request(`/products/${encodeURIComponent(productId)}/reviews`);
+    return reviews;
+  }
+  try {
+    return JSON.parse(localStorage.getItem(reviewStorageKey(productId)) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+export const submitProductReview = async (productId, review) => {
+  if (isOrderApiEnabled) {
+    const { review: savedReview } = await request(`/products/${encodeURIComponent(productId)}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(review),
+    });
+    return savedReview;
+  }
+  const savedReview = { ...review, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+  const existing = await fetchProductReviews(productId);
+  localStorage.setItem(reviewStorageKey(productId), JSON.stringify([savedReview, ...existing]));
+  return savedReview;
+};
+
+export const submitContactMessage = async (message) => {
+  const { message: savedMessage } = await request('/contact', {
+    method: 'POST',
+    body: JSON.stringify(message),
+  });
+  return savedMessage;
+};
+
+export const fetchAdminMessages = async (token) => {
+  const { messages } = await request('/admin/messages', { token });
+  return messages;
+};
+
+export const markAdminMessageRead = (token, messageId) =>
+  request(`/admin/messages/${encodeURIComponent(messageId)}/read`, {
+    method: 'PATCH',
+    token,
+    body: JSON.stringify({ isRead: true }),
+  });

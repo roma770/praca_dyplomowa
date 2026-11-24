@@ -22,5 +22,6 @@ export const checkoutSchema = z.object({
     .min(1, 'Wybierz datę dostawy.')
     .refine((v) => v >= todayISO(), 'Data dostawy nie może przypadać w przeszłości.'),
   slot: z.string().min(1, 'Wybierz przedział godzinowy.'),
+  cardDesign: z.string().min(1, 'Wybierz styl bileciku.'),
   cardText: z.string().max(200, 'Wiadomość może mieć maksymalnie 200 znaków.').optional(),
 });

@@ -93,6 +93,7 @@ export const AccountOrderHistory = ({ token }) => {
                 </span>
                 <strong className="text-gray-900">Razem: {order.totals.total} zł</strong>
               </div>
+              {order.delivery.cardDesignName && order.delivery.cardDesign !== 'none' && <p className="mt-2 text-xs text-gray-500">Bilecik: {order.delivery.cardDesignName}{order.delivery.cardText ? ` · „${order.delivery.cardText}”` : ''}</p>}
             </article>
           ))}
         </div>

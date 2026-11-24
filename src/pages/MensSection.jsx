@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductCard } from '../components/ProductCard';
+import { ProductCatalog } from '../components/ProductCatalog';
 import { useStoreProducts } from '../hooks/useStoreProducts';
 
 export const MensSection = () => {
@@ -23,12 +23,7 @@ export const MensSection = () => {
 
       <div className="max-w-7xl mx-auto px-4 pb-16">
         {error && <p role="status" className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mensProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-        {mensProducts.length === 0 && <p className="mt-6 text-center text-gray-500">Wkrótce dodamy nowe produkty.</p>}
+        <ProductCatalog products={mensProducts} />
       </div>
     </div>
   );

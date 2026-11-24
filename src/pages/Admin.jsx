@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, RefreshCw, Search, ShieldCheck, Truck } from 'lucide-react';
+import { Inbox, LogOut, RefreshCw, Search, ShieldCheck, Truck } from 'lucide-react';
 import { AdminProducts } from '../components/AdminProducts';
+import { AdminDashboard } from '../components/AdminDashboard';
 import {
+  fetchAdminMessages,
   fetchAdminOrders,
+  fetchAdminProducts,
+  markAdminMessageRead,
   isOrderApiEnabled,
   updateOrderStatus,
 } from '../lib/orderApi';
@@ -92,6 +96,7 @@ const OrderCard = ({ order, onStatusChange, saving }) => (
             „{order.delivery.cardText}”
           </p>
         )}
+        {order.delivery.cardDesignName && order.delivery.cardDesign !== 'none' && <p className="mt-2 text-xs text-gray-400">Bilecik: {order.delivery.cardDesignName}</p>}
       </div>
 
       <div>
@@ -132,10 +137,13 @@ export const Admin = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [savingOrderId, setSavingOrderId] = useState('');
+  const [savingMessageId, setSavingMessageId] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('orders');
+  const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [periodFilter, setPeriodFilter] = useState('all');
@@ -182,7 +190,14 @@ export const Admin = () => {
     setLoading(true);
     setError('');
     try {
-      setOrders(await fetchAdminOrders(activeToken));
+      const [nextOrders, nextProducts, nextMessages] = await Promise.all([
+        fetchAdminOrders(activeToken),
+        fetchAdminProducts(activeToken),
+        fetchAdminMessages(activeToken),
+      ]);
+      setOrders(nextOrders);
+      setProducts(nextProducts);
+      setMessages(nextMessages);
     } catch (loadError) {
       if (loadError.message.includes('Sign in')) {
         clearSession();
@@ -212,6 +227,19 @@ export const Admin = () => {
       setError(statusError.message);
     } finally {
       setSavingOrderId('');
+    }
+  };
+
+  const handleMarkMessageRead = async (messageId) => {
+    setSavingMessageId(messageId);
+    setError('');
+    try {
+      await markAdminMessageRead(token, messageId);
+      setMessages((current) => current.map((message) => message.id === messageId ? { ...message, isRead: true } : message));
+    } catch (messageError) {
+      setError(messageError.message);
+    } finally {
+      setSavingMessageId('');
     }
   };
 
@@ -255,8 +283,7 @@ export const Admin = () => {
 
           {token && (
             <div className="flex gap-2">
-              {activeTab === 'orders' && (
-                <button
+              <button
                   type="button"
                   onClick={() => loadOrders(token)}
                   disabled={loading}
@@ -264,8 +291,7 @@ export const Admin = () => {
                 >
                   <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
                   Odśwież
-                </button>
-              )}
+              </button>
               <button
                 type="button"
                 onClick={handleLogout}
@@ -278,17 +304,42 @@ export const Admin = () => {
           )}
         </div>
 
-        <div className="mb-6 flex gap-2 border-b border-gray-200">
-          <button type="button" onClick={() => setActiveTab('orders')} className={`border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'orders' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+        <div className="mb-6 flex gap-2 overflow-x-auto border-b border-gray-200">
+          <button type="button" onClick={() => setActiveTab('overview')} className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'overview' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+            Podsumowanie
+          </button>
+          <button type="button" onClick={() => setActiveTab('orders')} className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'orders' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
             Zamówienia
           </button>
-          <button type="button" onClick={() => setActiveTab('products')} className={`border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'products' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+          <button type="button" onClick={() => setActiveTab('products')} className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'products' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
             Produkty
+          </button>
+          <button type="button" onClick={() => setActiveTab('messages')} className={`inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition ${activeTab === 'messages' ? 'border-rose-500 text-rose-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+            Kontakt{messages.filter((message) => !message.isRead).length > 0 && <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-700">{messages.filter((message) => !message.isRead).length}</span>}
           </button>
         </div>
 
         {activeTab === 'products' ? (
           <AdminProducts token={token} />
+        ) : activeTab === 'overview' ? (
+          <>
+            {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+            {loading && orders.length === 0 && products.length === 0 ? <div className="rounded-2xl bg-white p-8 text-center text-gray-500">Ładowanie podsumowania…</div> : <AdminDashboard orders={orders} products={products} />}
+          </>
+        ) : activeTab === 'messages' ? (
+          <section className="space-y-4">
+            {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+            {messages.length === 0 ? <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center"><Inbox size={36} className="mx-auto text-gray-300" /><h2 className="mt-3 font-bold text-gray-800">Brak wiadomości</h2><p className="mt-1 text-sm text-gray-500">Wiadomości z formularza kontaktowego pojawią się tutaj.</p></div> : messages.map((message) => (
+              <article key={message.id} className={`rounded-2xl border bg-white p-5 shadow-sm ${message.isRead ? 'border-gray-100' : 'border-rose-200'}`}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h2 className="font-bold text-gray-900">{message.subject}</h2>{!message.isRead && <span className="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600">Nowa</span>}</div><p className="mt-1 text-sm text-gray-500">{message.name} · <a href={`mailto:${message.email}`} className="text-rose-600 hover:underline">{message.email}</a></p></div><time className="text-xs text-gray-400">{formatCreatedAt(message.createdAt)}</time></div>
+                <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-gray-700">{message.message}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a href={`mailto:${message.email}?subject=${encodeURIComponent(`Re: ${message.subject}`)}`} className="inline-flex rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50">Odpowiedz e-mailem</a>
+                  {!message.isRead && <button type="button" onClick={() => handleMarkMessageRead(message.id)} disabled={savingMessageId === message.id} className="inline-flex rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-100 disabled:opacity-50">{savingMessageId === message.id ? 'Zapisywanie…' : 'Oznacz jako przeczytaną'}</button>}
+                </div>
+              </article>
+            ))}
+          </section>
         ) : (
           <>
             {error && <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
