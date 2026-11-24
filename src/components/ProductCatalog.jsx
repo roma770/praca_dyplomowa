@@ -62,11 +62,11 @@ export const ProductCatalog = ({ products }) => {
   return (
     <section aria-label="Katalog produktów">
       <div className="mb-7 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:p-5">
-        <form onSubmit={updateQuery} className="grid gap-3 md:grid-cols-[minmax(220px,1fr)_190px_150px_190px_auto]">
-          <label className="relative block">
+        <form onSubmit={updateQuery} className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(220px,1fr)_190px_150px_190px_auto]">
+          <label className="relative block min-w-0">
             <span className="sr-only">Szukaj produktów</span>
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} type="search" placeholder="Szukaj kwiatów i prezentów" className="w-full rounded-xl border border-gray-200 py-3 pl-10 pr-3 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} type="search" placeholder="Szukaj kwiatów i prezentów" className="w-full min-w-0 rounded-xl border border-gray-200 py-3 pl-10 pr-3 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100" />
           </label>
           <label>
             <span className="sr-only">Kategoria</span>

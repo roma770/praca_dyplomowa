@@ -35,7 +35,7 @@ export const Contact = () => {
         <p className="mx-auto mt-4 max-w-xl leading-7 text-gray-300">Masz pytanie o bukiet, dostawę albo zamówienie? Napisz do nas, a wrócimy z odpowiedzią.</p>
       </section>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[minmax(0,1fr)_360px] md:py-14">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-14">
         <form onSubmit={handleSubmit} className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
           <h2 className="text-2xl font-bold text-gray-900">Wyślij wiadomość</h2>
           {success && <p role="status" className="mt-5 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">{success}</p>}

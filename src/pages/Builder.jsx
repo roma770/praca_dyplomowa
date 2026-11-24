@@ -34,7 +34,7 @@ export const Builder = () => {
 
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         {/* 3D-сцена (на телефоне прилипает к верху, чтобы букет был виден при выборе) */}
-        <div className="h-[300px] sm:h-[420px] lg:h-[620px] sticky top-16 lg:top-24 z-10 rounded-3xl overflow-hidden bg-gradient-to-b from-rose-50 to-rose-100 border border-rose-100">
+        <div className="relative z-10 h-[300px] overflow-hidden rounded-3xl border border-rose-100 bg-gradient-to-b from-rose-50 to-rose-100 sm:h-[420px] lg:sticky lg:top-24 lg:h-[620px]">
           <Suspense
             fallback={
               <div className="h-full flex items-center justify-center text-rose-400">Przygotowujemy podgląd bukietu…</div>

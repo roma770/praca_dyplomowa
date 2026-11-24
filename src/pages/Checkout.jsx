@@ -27,44 +27,48 @@ const CartItemRow = ({ item }) => {
   const removeFromCart = useCartStore((s) => s.removeFromCart);
 
   return (
-    <div className="flex items-center gap-4 py-3">
-      <img src={resolveProductImage(item.image)} alt={item.name} className="w-16 h-16 rounded-xl object-cover" />
-      <div className="flex-1 min-w-0">
+    <div className="flex flex-wrap items-center gap-3 py-3 sm:flex-nowrap sm:gap-4">
+      <img src={resolveProductImage(item.image)} alt={item.name} className="h-14 w-14 shrink-0 rounded-xl object-cover sm:h-16 sm:w-16" />
+      <div className="min-w-0 flex-1">
         <div className="font-semibold text-gray-800 truncate">{item.name}</div>
         <div className="text-sm text-gray-500">{item.price} zł</div>
         {item.description && item.id.startsWith('custom-') && (
           <div className="text-xs text-gray-400 truncate">{item.description}</div>
         )}
       </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => updateQuantity(item.id, -1)}
-          aria-label="Zmniejsz liczbę sztuk"
-          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-        >
-          <Minus size={14} />
-        </button>
-        <span className="w-6 text-center font-semibold">{item.quantity}</span>
-        <button
-          type="button"
-          onClick={() => updateQuantity(item.id, 1)}
-          aria-label="Zwiększ liczbę sztuk"
-          disabled={Number.isInteger(item.stock) && item.quantity >= item.stock}
-          className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Plus size={14} />
-        </button>
+      <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:flex-1 sm:justify-end sm:gap-4">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => updateQuantity(item.id, -1)}
+            aria-label="Zmniejsz liczbę sztuk"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200"
+          >
+            <Minus size={14} />
+          </button>
+          <span className="w-6 text-center font-semibold">{item.quantity}</span>
+          <button
+            type="button"
+            onClick={() => updateQuantity(item.id, 1)}
+            aria-label="Zwiększ liczbę sztuk"
+            disabled={Number.isInteger(item.stock) && item.quantity >= item.stock}
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="whitespace-nowrap text-right font-bold sm:w-20">{item.price * item.quantity} zł</div>
+          <button
+            type="button"
+            onClick={() => removeFromCart(item.id)}
+            aria-label="Usuń produkt"
+            className="text-gray-400 hover:text-rose-500"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
       </div>
-      <div className="w-20 text-right font-bold">{item.price * item.quantity} zł</div>
-      <button
-        type="button"
-        onClick={() => removeFromCart(item.id)}
-        aria-label="Usuń produkt"
-        className="text-gray-400 hover:text-rose-500"
-      >
-        <Trash2 size={18} />
-      </button>
     </div>
   );
 };
